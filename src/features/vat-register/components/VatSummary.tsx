@@ -17,10 +17,13 @@ export function VatSummary({ totals }: VatSummaryProps) {
       sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(3, minmax(0, 1fr))',
+          xs: 'minmax(0, 1fr)',
+          sm: 'repeat(2, minmax(0, 1fr))',
+          md: 'repeat(3, minmax(0, 1fr))',
         },
-        gap: { xs: 1.5, md: 2 },
+        gap: { xs: 1, md: 2 },
+        // two-column phone layout: Brutto gets its own full-width row
+        '& > :nth-of-type(3)': { gridColumn: { sm: '1 / -1', md: 'auto' } },
       }}
     >
       <SummaryCard

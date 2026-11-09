@@ -6,8 +6,12 @@ export const numericCellSx = {
   whiteSpace: 'nowrap',
 } as const
 
-// Secondary columns are shown from the desktop breakpoint up; below it the
-// same data is available in the expanded row.
+// Below these breakpoints the hidden columns' data is still available in the
+// expanded row (and on mobile the table is replaced by cards).
+export const laptopUpCellSx = {
+  display: { xs: 'none', lg: 'table-cell' },
+} as const
+
 export const desktopOnlyCellSx = {
   display: { xs: 'none', xl: 'table-cell' },
 } as const
@@ -17,3 +21,6 @@ export const truncatedTextSx = {
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 } as const
+
+// Full 10-column table needs the original roomy spacing only on wide desktops.
+export const WIDE_DESKTOP = '@media (min-width:1440px)'

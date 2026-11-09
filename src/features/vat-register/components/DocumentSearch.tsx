@@ -5,6 +5,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import { colors } from '@/theme/tokens'
+import { useViewportDown } from '../hooks/useViewportDown'
 
 interface DocumentSearchProps {
   value: string
@@ -17,11 +18,17 @@ export function DocumentSearch({
   onChange,
   onClear,
 }: DocumentSearchProps) {
+  const compact = useViewportDown('sm')
+
   return (
     <TextField
       value={value}
       onChange={(event) => onChange(event.target.value)}
-      placeholder="Szukaj kontrahenta, numeru dokumentu lub KSeF..."
+      placeholder={
+        compact
+          ? 'Szukaj dokumentów...'
+          : 'Szukaj kontrahenta, numeru dokumentu lub KSeF...'
+      }
       size="small"
       fullWidth
       slotProps={{

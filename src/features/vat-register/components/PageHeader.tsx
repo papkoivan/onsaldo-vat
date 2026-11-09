@@ -56,7 +56,12 @@ export function PageHeader({
         <Typography
           variant="h4"
           component="h1"
-          sx={{ fontWeight: 700, lineHeight: 1.2, mt: 0.25 }}
+          sx={{
+            fontWeight: 700,
+            lineHeight: 1.2,
+            mt: 0.25,
+            fontSize: { xs: '1.75rem', md: '2.125rem' },
+          }}
         >
           {title}
         </Typography>

@@ -17,14 +17,40 @@ import {
 import { KsefStatusChip } from './KsefStatusChip'
 import { numericCellSx } from './tableStyles'
 
-interface ExpandedDocumentDetailsProps {
+export type DocumentDetailsVariant = 'table' | 'card'
+
+interface DocumentDetailsProps {
   document: VatDocument
   id: string
+  /** `table`: bordered panels under a table row. `card`: flat stacked sections inside a mobile card. */
+  variant?: DocumentDetailsVariant
+}
+
+interface SectionTitles {
+  info: string
+  finance: string
+  extra: string
+}
+
+const sectionTitles: Record<DocumentDetailsVariant, SectionTitles> = {
+  table: {
+    info: 'Informacje o dokumencie',
+    finance: 'Informacje finansowe',
+    extra: 'Informacje dodatkowe',
+  },
+  card: {
+    info: 'Dane dokumentu',
+    finance: 'Wartości',
+    extra: 'KSeF i identyfikacja',
+  },
 }
 
 interface DetailSectionProps {
   title: string
+  variant: DocumentDetailsVariant
   children: ReactNode
+  /** Spans both columns of the two-column tablet layout. */
+  fullWidthOnTablet?: boolean
 }
 
 interface DetailRowProps {
@@ -36,16 +62,30 @@ interface DetailRowProps {
 
 const EMPTY_VALUE = '—'
 
-function DetailSection({ title, children }: DetailSectionProps) {
+function DetailSection({
+  title,
+  variant,
+  children,
+  fullWidthOnTablet = false,
+}: DetailSectionProps) {
+  const isCard = variant === 'card'
+
   return (
     <Box
       component="section"
       sx={{
         minWidth: 0,
-        p: 2,
-        borderRadius: '8px',
-        border: `1px solid ${colors.border}`,
-        backgroundColor: 'background.paper',
+        ...(isCard
+          ? { pt: 2, borderTop: `1px solid ${colors.border}` }
+          : {
+              p: 2,
+              borderRadius: '8px',
+              border: `1px solid ${colors.border}`,
+              backgroundColor: 'background.paper',
+            }),
+        ...(fullWidthOnTablet && {
+          gridColumn: { md: '1 / -1', lg: 'auto' },
+        }),
       }}
     >
       <Typography
@@ -78,7 +118,10 @@ function DetailRow({
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(96px, 40%) minmax(0, 1fr)',
+        gridTemplateColumns: {
+          xs: 'minmax(88px, 38%) minmax(0, 1fr)',
+          md: 'minmax(96px, 40%) minmax(0, 1fr)',
+        },
         columnGap: 1.5,
         alignItems: 'center',
       }}
@@ -116,27 +159,35 @@ const compactHeadCellSx = {
 
 const compactBodyCellSx = { px: 0, py: 0.5, fontSize: '0.8125rem' } as const
 
-export function ExpandedDocumentDetails({
+export function DocumentDetails({
   document,
   id,
-}: ExpandedDocumentDetailsProps) {
+  variant = 'table',
+}: DocumentDetailsProps) {
+  const titles = sectionTitles[variant]
+
   return (
     <Box
       id={id}
       role="region"
       aria-label={`Szczegóły dokumentu ${document.documentNumber}`}
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: 'minmax(0, 1fr)',
-          md: 'repeat(3, minmax(0, 1fr))',
-        },
-        gap: 2,
-        p: 2,
-        backgroundColor: colors.surfaceMuted,
-      }}
+      sx={
+        variant === 'card'
+          ? { display: 'grid', gap: 2, px: 2, pb: 2 }
+          : {
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'minmax(0, 1fr)',
+                md: 'repeat(2, minmax(0, 1fr))',
+                lg: 'repeat(3, minmax(0, 1fr))',
+              },
+              gap: 2,
+              p: 2,
+              backgroundColor: colors.surfaceMuted,
+            }
+      }
     >
-      <DetailSection title="Informacje o dokumencie">
+      <DetailSection title={titles.info} variant={variant}>
         <DetailList>
           <DetailRow label="Kontrahent">{document.contractor}</DetailRow>
           <DetailRow label="NIP">{formatNip(document.nip)}</DetailRow>
@@ -161,7 +212,7 @@ export function ExpandedDocumentDetails({
         </DetailList>
       </DetailSection>
 
-      <DetailSection title="Informacje finansowe">
+      <DetailSection title={titles.finance} variant={variant}>
         <DetailList>
           <DetailRow label="Netto" numeric>
             {formatCurrency(document.netAmount)}
@@ -214,7 +265,7 @@ export function ExpandedDocumentDetails({
         </Table>
       </DetailSection>
 
-      <DetailSection title="Informacje dodatkowe">
+      <DetailSection title={titles.extra} variant={variant} fullWidthOnTablet>
         <DetailList>
           <DetailRow label="Numer KSeF">
             {document.ksefNumber ?? EMPTY_VALUE}

@@ -20,7 +20,7 @@ export function SummaryCard({ label, value, icon }: SummaryCardProps) {
         gap: 1.5,
         minWidth: 0,
         px: { xs: 2, md: 2.5 },
-        py: 1.75,
+        py: { xs: 1.25, md: 1.75 },
         borderRadius: '12px',
         backgroundColor: 'background.paper',
       }}
@@ -28,13 +28,13 @@ export function SummaryCard({ label, value, icon }: SummaryCardProps) {
       <Box
         aria-hidden
         sx={{
-          // icon hidden only on narrow tablets, where three cards share one row
-          display: { xs: 'flex', sm: 'none', md: 'flex' },
+          // icon hidden only on portrait tablets, where three cards share one narrow row
+          display: { xs: 'flex', md: 'none', lg: 'flex' },
           flexShrink: 0,
           alignItems: 'center',
           justifyContent: 'center',
-          width: 44,
-          height: 44,
+          width: { xs: 40, md: 44 },
+          height: { xs: 40, md: 44 },
           borderRadius: '10px',
           backgroundColor: 'primary.light',
           color: 'primary.main',
@@ -48,7 +48,7 @@ export function SummaryCard({ label, value, icon }: SummaryCardProps) {
         </Typography>
         <Typography
           sx={{
-            fontSize: { xs: '1.375rem', sm: '1.25rem', lg: '1.5rem' },
+            fontSize: { xs: '1.25rem', lg: '1.5rem' },
             fontWeight: 700,
             lineHeight: 1.3,
             fontVariantNumeric: 'tabular-nums',

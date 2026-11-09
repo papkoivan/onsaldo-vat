@@ -43,6 +43,8 @@ export function FiltersDrawer({
           sx: {
             width: { xs: '100%', sm: 400 },
             maxWidth: '100%',
+            // dvh keeps the footer buttons above the mobile browser toolbar
+            height: '100dvh',
             boxShadow: '-8px 0 24px rgba(20, 33, 28, 0.08)',
           },
         },
@@ -55,7 +57,7 @@ export function FiltersDrawer({
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: 2,
-          px: 3,
+          px: { xs: 2, sm: 3 },
           pt: 2.5,
           pb: 2,
           borderBottom: `1px solid ${colors.border}`,
@@ -79,14 +81,14 @@ export function FiltersDrawer({
             edge="end"
             aria-label="Zamknij filtry"
             onClick={onClose}
-            sx={{ mt: -0.5 }}
+            sx={{ mt: -0.5, width: 44, height: 44 }}
           >
             <CloseOutlined />
           </IconButton>
         </Tooltip>
       </Box>
 
-      <Box sx={{ flex: 1, overflowY: 'auto', px: 3, py: 3 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', px: { xs: 2, sm: 3 }, py: 3 }}>
         <FilterForm values={values} options={options} onChange={onChange} />
       </Box>
 
@@ -95,16 +97,27 @@ export function FiltersDrawer({
         sx={{
           display: 'flex',
           gap: 1.5,
-          px: 3,
-          py: 2,
+          px: { xs: 2, sm: 3 },
+          pt: 2,
+          pb: 'max(16px, env(safe-area-inset-bottom))',
           borderTop: `1px solid ${colors.border}`,
           backgroundColor: 'background.paper',
         }}
       >
-        <Button variant="outlined" color="inherit" onClick={onReset}>
+        <Button
+          variant="outlined"
+          color="inherit"
+          onClick={onReset}
+          sx={{ minHeight: 44 }}
+        >
           Wyczyść
         </Button>
-        <Button variant="contained" fullWidth onClick={onApply}>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={onApply}
+          sx={{ minHeight: 44 }}
+        >
           Zastosuj filtry
         </Button>
       </Box>

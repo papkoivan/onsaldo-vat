@@ -3,17 +3,20 @@ import type { MouseEvent, ReactElement } from 'react'
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined'
+import CheckBoxOutlined from '@mui/icons-material/CheckBoxOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
+import Divider from '@mui/material/Divider'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import Tooltip from '@mui/material/Tooltip'
 import { colors } from '@/theme/tokens'
+import { useViewportDown } from '../hooks/useViewportDown'
 import { DocumentSearch } from './DocumentSearch'
 
 interface DocumentToolbarProps {
@@ -40,7 +43,8 @@ interface ToolbarIconButtonProps {
   disabledHint: string
 }
 
-const buttonSize = 40
+// 44px touch targets below the tablet breakpoint, 40px from md up
+const buttonSize = { xs: 44, md: 40 } as const
 
 const outlinedButtonSx = {
   width: buttonSize,
@@ -52,6 +56,8 @@ const outlinedButtonSx = {
   '&:hover': { backgroundColor: colors.surfaceMuted },
   '&.Mui-disabled': { backgroundColor: colors.surfaceMuted },
 } as const
+
+const menuItemSx = { minHeight: 44 } as const
 
 function ToolbarIconButton({
   label,
@@ -90,12 +96,18 @@ export function DocumentToolbar({
   canResetAll,
   onResetAll,
 }: DocumentToolbarProps) {
+  const compact = useViewportDown('sm')
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const closeMenu = () => setMenuAnchor(null)
 
   const handleResetAll = () => {
     closeMenu()
     onResetAll()
+  }
+
+  const handleMenuAction = (action?: () => void) => () => {
+    closeMenu()
+    action?.()
   }
 
   const handleSelectAll = () => {
@@ -136,12 +148,9 @@ export function DocumentToolbar({
           onClick={onOpenFilters}
           aria-haspopup="dialog"
           sx={{
-            flexGrow: { xs: 1, sm: 0 },
+            flexGrow: { xs: 1, md: 0 },
             minWidth: 0,
             px: { xs: 1.5, md: 2 },
-            '& .MuiButton-startIcon': {
-              display: { xs: 'none', sm: 'inherit' },
-            },
             height: buttonSize,
             color: 'primary.main',
             borderColor: 'primary.main',
@@ -154,24 +163,28 @@ export function DocumentToolbar({
         >
           {activeFilterCount > 0 ? `Filtry (${activeFilterCount})` : 'Filtry'}
         </Button>
-        <ToolbarIconButton
-          label="Oznacz dokumenty"
-          icon={<LocalOfferOutlined />}
-          onClick={onTag}
-          disabledHint="najpierw zaznacz dokumenty (wkrótce)"
-        />
-        <ToolbarIconButton
-          label="Drukuj"
-          icon={<PrintOutlined />}
-          onClick={onPrint}
-          disabledHint=""
-        />
-        <ToolbarIconButton
-          label="Eksportuj do CSV"
-          icon={<FileDownloadOutlined />}
-          onClick={onExport}
-          disabledHint="dostępne po wczytaniu dokumentów (wkrótce)"
-        />
+        {!compact && (
+          <>
+            <ToolbarIconButton
+              label="Oznacz dokumenty"
+              icon={<LocalOfferOutlined />}
+              onClick={onTag}
+              disabledHint="najpierw zaznacz dokumenty (wkrótce)"
+            />
+            <ToolbarIconButton
+              label="Drukuj"
+              icon={<PrintOutlined />}
+              onClick={onPrint}
+              disabledHint=""
+            />
+            <ToolbarIconButton
+              label="Eksportuj do CSV"
+              icon={<FileDownloadOutlined />}
+              onClick={onExport}
+              disabledHint="dostępne po wczytaniu dokumentów (wkrótce)"
+            />
+          </>
+        )}
         <Tooltip title="Więcej akcji">
           <IconButton
             aria-label="Więcej akcji"
@@ -192,13 +205,59 @@ export function DocumentToolbar({
           open={menuAnchor !== null}
           onClose={closeMenu}
         >
-          <MenuItem disabled={!canResetAll} onClick={handleResetAll}>
+          {compact && [
+            <MenuItem
+              key="tag"
+              disabled={!onTag}
+              onClick={handleMenuAction(onTag)}
+              sx={menuItemSx}
+            >
+              <ListItemIcon>
+                <LocalOfferOutlined fontSize="small" />
+              </ListItemIcon>
+              Oznacz dokumenty
+            </MenuItem>,
+            <MenuItem
+              key="print"
+              onClick={handleMenuAction(onPrint)}
+              sx={menuItemSx}
+            >
+              <ListItemIcon>
+                <PrintOutlined fontSize="small" />
+              </ListItemIcon>
+              Drukuj
+            </MenuItem>,
+            <MenuItem
+              key="export"
+              disabled={!onExport}
+              onClick={handleMenuAction(onExport)}
+              sx={menuItemSx}
+            >
+              <ListItemIcon>
+                <FileDownloadOutlined fontSize="small" />
+              </ListItemIcon>
+              Eksportuj do CSV
+            </MenuItem>,
+            <Divider key="divider" />,
+          ]}
+          <MenuItem
+            disabled={!canResetAll}
+            onClick={handleResetAll}
+            sx={menuItemSx}
+          >
             <ListItemIcon>
               <RestartAltOutlined fontSize="small" />
             </ListItemIcon>
             Wyczyść wyszukiwanie i filtry
           </MenuItem>
-          <MenuItem disabled={!onSelectAll} onClick={handleSelectAll}>
+          <MenuItem
+            disabled={!onSelectAll}
+            onClick={handleSelectAll}
+            sx={menuItemSx}
+          >
+            <ListItemIcon>
+              <CheckBoxOutlined fontSize="small" />
+            </ListItemIcon>
             Zaznacz wszystkie widoczne
           </MenuItem>
         </Menu>

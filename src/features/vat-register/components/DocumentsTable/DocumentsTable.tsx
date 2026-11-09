@@ -1,6 +1,3 @@
-import SearchOffOutlined from '@mui/icons-material/SearchOffOutlined'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -8,15 +5,17 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import Typography from '@mui/material/Typography'
 import type { VatDocument } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
-import { DocumentTableRow } from './DocumentTableRow'
+import { DocumentsEmptyState } from '../DocumentsEmptyState'
 import {
   TABLE_COLUMN_COUNT,
+  WIDE_DESKTOP,
   desktopOnlyCellSx,
+  laptopUpCellSx,
   numericCellSx,
-} from './tableStyles'
+} from '../tableStyles'
+import { DocumentTableRow } from './DocumentTableRow'
 
 interface DocumentsTableProps {
   documents: readonly VatDocument[]
@@ -62,7 +61,13 @@ export function DocumentsTable({
       <Table
         size="small"
         aria-label="Dokumenty rejestru VAT"
-        sx={{ minWidth: 760 }}
+        sx={{
+          // tighter horizontal rhythm below the desktop breakpoint
+          '& .MuiTableCell-root:not(.MuiTableCell-paddingCheckbox)': {
+            px: 1.25,
+            [WIDE_DESKTOP]: { px: 2 },
+          },
+        }}
       >
         <TableHead>
           <TableRow>
@@ -88,10 +93,16 @@ export function DocumentsTable({
             <TableCell sx={{ ...headCellSx, ...desktopOnlyCellSx }}>
               Identyfikator
             </TableCell>
-            <TableCell sx={{ ...headCellSx, ...numericCellSx }}>
+            <TableCell
+              sx={{ ...headCellSx, ...numericCellSx, ...laptopUpCellSx }}
+            >
               Kwota netto
             </TableCell>
-            <TableCell sx={{ ...headCellSx, ...numericCellSx }}>VAT</TableCell>
+            <TableCell
+              sx={{ ...headCellSx, ...numericCellSx, ...laptopUpCellSx }}
+            >
+              VAT
+            </TableCell>
             <TableCell sx={{ ...headCellSx, ...numericCellSx }}>
               Kwota brutto
             </TableCell>
@@ -106,38 +117,7 @@ export function DocumentsTable({
           {documents.length === 0 ? (
             <TableRow>
               <TableCell colSpan={TABLE_COLUMN_COUNT} sx={{ borderBottom: 0 }}>
-                <Box
-                  role="status"
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 1,
-                    py: 6,
-                    textAlign: 'center',
-                  }}
-                >
-                  <SearchOffOutlined
-                    aria-hidden
-                    sx={{ fontSize: 40, color: 'text.secondary' }}
-                  />
-                  <Typography sx={{ fontWeight: 600 }}>
-                    Brak dokumentów do wyświetlenia
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Żaden dokument nie spełnia wybranych kryteriów wyszukiwania
-                    i filtrów.
-                  </Typography>
-                  {onResetFilters && (
-                    <Button
-                      variant="outlined"
-                      onClick={onResetFilters}
-                      sx={{ mt: 1 }}
-                    >
-                      Wyczyść wyszukiwanie i filtry
-                    </Button>
-                  )}
-                </Box>
+                <DocumentsEmptyState onResetFilters={onResetFilters} />
               </TableCell>
             </TableRow>
           ) : (

@@ -36,7 +36,10 @@ function FilterSelect({
       label={FILTER_LABELS[filterKey]}
       value={values[filterKey]}
       onChange={(event) => onChange(filterKey, event.target.value)}
-      sx={{ '& .MuiSelect-select': { textTransform } }}
+      sx={{
+        '& .MuiSelect-select': { textTransform },
+        '& .MuiInputBase-root': { minHeight: { xs: 48, sm: 40 } },
+      }}
     >
       <MenuItem value={ALL_FILTER_VALUE}>Wszystkie</MenuItem>
       {options[filterKey].map((option) => (

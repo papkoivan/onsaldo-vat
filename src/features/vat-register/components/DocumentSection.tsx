@@ -5,8 +5,12 @@ import type { VatDocument } from '@/domain/vat'
 import { useDocumentSelection } from '../hooks/useDocumentSelection'
 import type { DocumentSearchState } from '../hooks/useDocumentSearch'
 import { useExpandedDocuments } from '../hooks/useExpandedDocuments'
+import { usePagination } from '../hooks/usePagination'
+import { useViewportDown } from '../hooks/useViewportDown'
 import type { VatFiltersState } from '../hooks/useVatFilters'
 import { ActiveFilters } from './ActiveFilters'
+import { DocumentsList } from './DocumentsList/DocumentsList'
+import { DocumentsPagination } from './DocumentsPagination'
 import { DocumentsTable } from './DocumentsTable/DocumentsTable'
 import { DocumentSectionHeader } from './DocumentSectionHeader'
 import { DocumentToolbar } from './DocumentToolbar'
@@ -27,9 +31,12 @@ export function DocumentSection({
   search,
   filters,
 }: DocumentSectionProps) {
+  const isMobile = useViewportDown('md')
+  const pagination = usePagination(documents)
+  const { pageItems } = pagination
   const visibleIds = useMemo(
-    () => documents.map((document) => document.id),
-    [documents],
+    () => pageItems.map((document) => document.id),
+    [pageItems],
   )
   const expanded = useExpandedDocuments()
   const selection = useDocumentSelection(visibleIds)
@@ -62,7 +69,7 @@ export function DocumentSection({
         activeFilterCount={filters.activeFilters.length}
         onOpenFilters={filters.openDrawer}
         onPrint={() => window.print()}
-        onSelectAll={documents.length > 0 ? selection.selectAll : undefined}
+        onSelectAll={pageItems.length > 0 ? selection.selectAll : undefined}
         canResetAll={canResetAll}
         onResetAll={handleResetAll}
       />
@@ -71,17 +78,29 @@ export function DocumentSection({
         onRemove={filters.removeFilter}
         onClearAll={filters.clearAll}
       />
-      <DocumentsTable
-        documents={documents}
-        expandedIds={expanded.expandedIds}
-        onToggleExpand={expanded.toggle}
-        selectedIds={selection.selectedIds}
-        allSelected={selection.allSelected}
-        someSelected={selection.someSelected}
-        onToggleSelect={selection.toggle}
-        onToggleSelectAll={selection.toggleAll}
-        onResetFilters={canResetAll ? handleResetAll : undefined}
-      />
+      {isMobile ? (
+        <DocumentsList
+          documents={pageItems}
+          expandedIds={expanded.expandedIds}
+          onToggleExpand={expanded.toggle}
+          selectedIds={selection.selectedIds}
+          onToggleSelect={selection.toggle}
+          onResetFilters={canResetAll ? handleResetAll : undefined}
+        />
+      ) : (
+        <DocumentsTable
+          documents={pageItems}
+          expandedIds={expanded.expandedIds}
+          onToggleExpand={expanded.toggle}
+          selectedIds={selection.selectedIds}
+          allSelected={selection.allSelected}
+          someSelected={selection.someSelected}
+          onToggleSelect={selection.toggle}
+          onToggleSelectAll={selection.toggleAll}
+          onResetFilters={canResetAll ? handleResetAll : undefined}
+        />
+      )}
+      <DocumentsPagination pagination={pagination} />
       <FiltersDrawer
         open={filters.isDrawerOpen}
         values={filters.draftFilters}

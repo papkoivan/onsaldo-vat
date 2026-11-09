@@ -12,7 +12,8 @@ export const theme = createTheme({
     divider: colors.border,
     background: { default: colors.background, paper: colors.surface },
   },
-  breakpoints: { values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1440 } },
+  // xs <768 mobile (cards) · md 768 tablet · lg 1024 laptop · xl 1200 desktop
+  breakpoints: { values: { xs: 0, sm: 600, md: 768, lg: 1024, xl: 1200 } },
   shape: { borderRadius: layout.radius },
   typography: { fontFamily },
   components: {

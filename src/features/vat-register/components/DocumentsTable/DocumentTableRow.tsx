@@ -10,14 +10,16 @@ import Tooltip from '@mui/material/Tooltip'
 import type { VatDocument } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
 import { formatCurrency, formatDate } from '@/utils/format'
-import { ExpandedDocumentDetails } from './ExpandedDocumentDetails'
-import { KsefStatusChip } from './KsefStatusChip'
+import { DocumentDetails } from '../DocumentDetails'
+import { KsefStatusChip } from '../KsefStatusChip'
 import {
   TABLE_COLUMN_COUNT,
+  WIDE_DESKTOP,
   desktopOnlyCellSx,
+  laptopUpCellSx,
   numericCellSx,
   truncatedTextSx,
-} from './tableStyles'
+} from '../tableStyles'
 
 interface DocumentTableRowProps {
   document: VatDocument
@@ -63,7 +65,7 @@ export function DocumentTableRow({
             }}
           />
         </TableCell>
-        <TableCell sx={{ maxWidth: 260, fontWeight: 600 }}>
+        <TableCell sx={{ maxWidth: { xs: 200, lg: 260 }, fontWeight: 600 }}>
           <Box sx={truncatedTextSx} title={document.contractor}>
             {document.contractor}
           </Box>
@@ -74,7 +76,13 @@ export function DocumentTableRow({
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           {document.documentNumber}
         </TableCell>
-        <TableCell sx={{ ...desktopOnlyCellSx, maxWidth: 300 }}>
+        <TableCell
+          sx={{
+            ...desktopOnlyCellSx,
+            maxWidth: 240,
+            [WIDE_DESKTOP]: { maxWidth: 300 },
+          }}
+        >
           {document.ksefNumber ? (
             <Box sx={truncatedTextSx} title={document.ksefNumber}>
               {document.ksefNumber}
@@ -86,10 +94,10 @@ export function DocumentTableRow({
         <TableCell sx={{ ...desktopOnlyCellSx, whiteSpace: 'nowrap' }}>
           {document.identifier}
         </TableCell>
-        <TableCell sx={numericCellSx}>
+        <TableCell sx={{ ...numericCellSx, ...laptopUpCellSx }}>
           {formatCurrency(document.netAmount)}
         </TableCell>
-        <TableCell sx={numericCellSx}>
+        <TableCell sx={{ ...numericCellSx, ...laptopUpCellSx }}>
           {formatCurrency(document.vatAmount)}
         </TableCell>
         <TableCell sx={{ ...numericCellSx, fontWeight: 600 }}>
@@ -119,7 +127,7 @@ export function DocumentTableRow({
           sx={{ p: 0, borderBottom: expanded ? undefined : 'none' }}
         >
           <Collapse in={expanded} timeout="auto">
-            <ExpandedDocumentDetails document={document} id={detailsId} />
+            <DocumentDetails document={document} id={detailsId} />
           </Collapse>
         </TableCell>
       </TableRow>
