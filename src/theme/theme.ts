@@ -12,6 +12,7 @@ export const theme = createTheme({
     divider: colors.border,
     background: { default: colors.background, paper: colors.surface },
   },
+  breakpoints: { values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1440 } },
   shape: { borderRadius: layout.radius },
   typography: { fontFamily },
   components: {

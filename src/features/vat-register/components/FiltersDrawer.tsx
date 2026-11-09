@@ -6,12 +6,13 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { colors } from '@/theme/tokens'
-import type { FilterKey, VatFilters } from '../types/filters'
+import type { FilterKey, FilterOption, VatFilters } from '../types/filters'
 import { FilterForm } from './FilterForm'
 
 interface FiltersDrawerProps {
   open: boolean
   values: VatFilters
+  options: Record<FilterKey, readonly FilterOption[]>
   onChange: (key: FilterKey, value: string) => void
   onClose: () => void
   onReset: () => void
@@ -23,6 +24,7 @@ const TITLE_ID = 'filters-drawer-title'
 export function FiltersDrawer({
   open,
   values,
+  options,
   onChange,
   onClose,
   onReset,
@@ -85,7 +87,7 @@ export function FiltersDrawer({
       </Box>
 
       <Box sx={{ flex: 1, overflowY: 'auto', px: 3, py: 3 }}>
-        <FilterForm values={values} onChange={onChange} />
+        <FilterForm values={values} options={options} onChange={onChange} />
       </Box>
 
       <Box

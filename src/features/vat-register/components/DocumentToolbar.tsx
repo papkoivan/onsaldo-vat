@@ -27,6 +27,8 @@ interface DocumentToolbarProps {
   onExport?: () => void
   /** Undefined until document selection is available — the action stays disabled. */
   onTag?: () => void
+  /** Undefined when there are no documents to select. */
+  onSelectAll?: () => void
   canResetAll: boolean
   onResetAll: () => void
 }
@@ -84,6 +86,7 @@ export function DocumentToolbar({
   onPrint,
   onExport,
   onTag,
+  onSelectAll,
   canResetAll,
   onResetAll,
 }: DocumentToolbarProps) {
@@ -93,6 +96,11 @@ export function DocumentToolbar({
   const handleResetAll = () => {
     closeMenu()
     onResetAll()
+  }
+
+  const handleSelectAll = () => {
+    closeMenu()
+    onSelectAll?.()
   }
 
   return (
@@ -190,7 +198,9 @@ export function DocumentToolbar({
             </ListItemIcon>
             Wyczyść wyszukiwanie i filtry
           </MenuItem>
-          <MenuItem disabled>Zaznacz wszystkie (wkrótce)</MenuItem>
+          <MenuItem disabled={!onSelectAll} onClick={handleSelectAll}>
+            Zaznacz wszystkie widoczne
+          </MenuItem>
         </Menu>
       </Box>
     </Box>

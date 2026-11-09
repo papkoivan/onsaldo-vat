@@ -41,6 +41,18 @@ export function useVatFilters(initialFilters: VatFilters = DEFAULT_FILTERS) {
 
   const clearAll = useCallback(() => setAppliedFilters(EMPTY_FILTERS), [])
 
+  // operation type, JPK code and series differ between registers
+  const resetRegisterFilters = useCallback(() => {
+    const reset = (current: VatFilters): VatFilters => ({
+      ...current,
+      operationType: ALL_FILTER_VALUE,
+      jpkCode: ALL_FILTER_VALUE,
+      documentSeries: ALL_FILTER_VALUE,
+    })
+    setAppliedFilters(reset)
+    setDraftFilters(reset)
+  }, [])
+
   return {
     appliedFilters,
     draftFilters,
@@ -53,6 +65,7 @@ export function useVatFilters(initialFilters: VatFilters = DEFAULT_FILTERS) {
     applyDraft,
     removeFilter,
     clearAll,
+    resetRegisterFilters,
   }
 }
 

@@ -3,12 +3,12 @@ import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { filterOptions } from '@/mocks/filterOptions'
 import { ALL_FILTER_VALUE, FILTER_LABELS } from '../types/filters'
-import type { FilterKey, VatFilters } from '../types/filters'
+import type { FilterKey, FilterOption, VatFilters } from '../types/filters'
 
 interface FilterFormProps {
   values: VatFilters
+  options: Record<FilterKey, readonly FilterOption[]>
   onChange: (key: FilterKey, value: string) => void
 }
 
@@ -20,6 +20,7 @@ interface FilterSelectProps extends FilterFormProps {
 function FilterSelect({
   filterKey,
   values,
+  options,
   onChange,
   capitalize = false,
 }: FilterSelectProps) {
@@ -38,7 +39,7 @@ function FilterSelect({
       sx={{ '& .MuiSelect-select': { textTransform } }}
     >
       <MenuItem value={ALL_FILTER_VALUE}>Wszystkie</MenuItem>
-      {filterOptions[filterKey].map((option) => (
+      {options[filterKey].map((option) => (
         <MenuItem
           key={option.value}
           value={option.value}
@@ -72,8 +73,8 @@ function FilterGroup({
   )
 }
 
-export function FilterForm({ values, onChange }: FilterFormProps) {
-  const shared = { values, onChange }
+export function FilterForm({ values, options, onChange }: FilterFormProps) {
+  const shared = { values, options, onChange }
 
   return (
     <Stack spacing={3}>

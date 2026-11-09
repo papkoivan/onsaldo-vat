@@ -20,6 +20,23 @@ export const formatCurrency = (value: number): string =>
 export const formatPercent = (fraction: number): string =>
   percentFormatter.format(fraction)
 
+const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: 'UTC',
+})
+
+/** @param isoDate calendar date in `YYYY-MM-DD` form */
+export const formatDate = (isoDate: string): string =>
+  dateFormatter.format(new Date(isoDate))
+
+/** Polish NIPs are shown as `XXX-XXX-XX-XX`; foreign VAT IDs are kept as is. */
+export const formatNip = (nip: string): string =>
+  /^\d{10}$/.test(nip)
+    ? `${nip.slice(0, 3)}-${nip.slice(3, 6)}-${nip.slice(6, 8)}-${nip.slice(8)}`
+    : nip
+
 export const formatVatRate = (rate: VatRate): string =>
   rate === 'np' ? 'np' : `${rate}%`
 

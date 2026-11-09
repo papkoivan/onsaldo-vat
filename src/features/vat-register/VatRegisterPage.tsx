@@ -1,11 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import type { RegisterType } from '@/domain/vat'
-import { demoDocumentCount } from '@/mocks/filterOptions'
-import { vatBreakdownByRegister } from '@/mocks/vatBreakdown'
+import { getFilterOptions } from '@/mocks/filterOptions'
 import { layout } from '@/theme/tokens'
-import { calculateTotals } from '@/utils/vatCalculations'
 import { PageHeader } from './components/PageHeader'
 import type { PageHeaderBadge } from './components/PageHeader'
 import { DocumentSection } from './components/DocumentSection'
@@ -14,6 +12,7 @@ import { VatConfirmationNotice } from './components/VatConfirmationNotice'
 import { VatRateBreakdown } from './components/VatRateBreakdown'
 import { VatSummary } from './components/VatSummary'
 import { useDocumentSearch } from './hooks/useDocumentSearch'
+import { useDocuments } from './hooks/useDocuments'
 import { useVatFilters } from './hooks/useVatFilters'
 
 const headerBadges: readonly PageHeaderBadge[] = [
@@ -26,8 +25,16 @@ export function VatRegisterPage() {
   const search = useDocumentSearch()
   const filters = useVatFilters()
 
-  const breakdown = vatBreakdownByRegister[register]
-  const totals = useMemo(() => calculateTotals(breakdown), [breakdown])
+  const { documents, totals, breakdown } = useDocuments(
+    register,
+    search.query,
+    filters.appliedFilters,
+  )
+
+  const handleRegisterChange = (next: RegisterType) => {
+    setRegister(next)
+    filters.resetRegisterFilters()
+  }
 
   return (
     <Box
@@ -49,7 +56,7 @@ export function VatRegisterPage() {
           subtitle="Sprzedaż i zakupy w wybranym okresie — podgląd danych demonstracyjnych."
           badges={headerBadges}
         />
-        <RegisterTabs value={register} onChange={setRegister} />
+        <RegisterTabs value={register} onChange={handleRegisterChange} />
         <VatConfirmationNotice>
           Kontekst VAT wymaga potwierdzenia. Poniżej wyłącznie dane
           demonstracyjne, nie ewidencja organizacji.
@@ -59,7 +66,8 @@ export function VatRegisterPage() {
           <VatRateBreakdown items={breakdown} />
         </Stack>
         <DocumentSection
-          documentCount={demoDocumentCount}
+          documents={documents}
+          filterOptions={getFilterOptions(register)}
           search={search}
           filters={filters}
         />
