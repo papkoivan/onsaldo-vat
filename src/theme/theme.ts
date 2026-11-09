@@ -20,5 +20,33 @@ export const theme = createTheme({
         body: { minWidth: layout.minViewportWidth },
       },
     },
+    MuiButton: {
+      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: { textTransform: 'none', fontWeight: 600 },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        root: { minHeight: 48, borderBottom: `1px solid ${colors.border}` },
+        indicator: { height: 3, borderRadius: '3px 3px 0 0' },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          minHeight: 48,
+          textTransform: 'none',
+          fontSize: '0.9375rem',
+          fontWeight: 600,
+          color: colors.textSecondary,
+          borderRadius: `${layout.radius}px ${layout.radius}px 0 0`,
+          '&.Mui-selected': {
+            color: colors.primary,
+            backgroundColor: colors.primaryLight,
+          },
+        },
+      },
+    },
   },
 })

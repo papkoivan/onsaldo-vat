@@ -10,11 +10,14 @@ export const colors = {
   border: '#dde5e1',
   background: '#f7f9f8',
   surface: '#ffffff',
+  surfaceMuted: '#f1f5f3',
 } as const
 
 export const layout = {
-  minViewportWidth: 1200,
+  minViewportWidth: 320,
   pagePaddingX: 24,
+  pagePaddingXMobile: 16,
+  maxContentWidth: 1680,
   radius: 8,
 } as const
 
