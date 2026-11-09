@@ -1,0 +1,1 @@
+export { VatRegisterPage } from './VatRegisterPage'
