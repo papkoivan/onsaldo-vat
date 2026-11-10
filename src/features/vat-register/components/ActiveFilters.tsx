@@ -31,6 +31,8 @@ export function ActiveFilters({
         <Chip
           key={filter.key}
           variant="outlined"
+          // clickable as a whole, so Enter/Space and a tap on the label also remove it
+          onClick={() => onRemove(filter.key)}
           onDelete={() => onRemove(filter.key)}
           deleteIcon={
             <CloseOutlined
@@ -44,7 +46,7 @@ export function ActiveFilters({
             </>
           }
           sx={{
-            height: 32,
+            height: { xs: 40, md: 32 },
             backgroundColor: 'background.paper',
             borderColor: colors.border,
             '& .MuiChip-label': { color: 'text.secondary' },
@@ -52,7 +54,11 @@ export function ActiveFilters({
           }}
         />
       ))}
-      <Button size="small" onClick={onClearAll}>
+      <Button
+        size="small"
+        onClick={onClearAll}
+        sx={{ minHeight: { xs: 44, md: 'auto' } }}
+      >
         Wyczyść filtry
       </Button>
     </Stack>

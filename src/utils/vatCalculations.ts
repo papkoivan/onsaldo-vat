@@ -6,8 +6,28 @@ import type {
   VatTotals,
 } from '@/domain/vat'
 
-export const roundMoney = (value: number): number =>
-  Math.round(value * 100) / 100
+// Money is summed as integer grosze so that float noise (0.1 + 0.2) never reaches the UI.
+// Halves round away from zero, which keeps corrections (negative amounts) symmetric.
+const roundHalfAwayFromZero = (value: number): number =>
+  Math.sign(value) * Math.round(Math.abs(value))
+
+const toCents = (amount: number): number => roundHalfAwayFromZero(amount * 100)
+
+const fromCents = (cents: number): number => cents / 100
+
+export const roundMoney = (amount: number): number => fromCents(toCents(amount))
+
+export const sumMoney = (amounts: Iterable<number>): number => {
+  let cents = 0
+  for (const amount of amounts) cents += toCents(amount)
+  return fromCents(cents)
+}
+
+/** VAT for a net amount at a rate in percent, computed on integer grosze. `np` carries no VAT. */
+export const calculateVatAmount = (netAmount: number, rate: VatRate): number =>
+  rate === 'np'
+    ? 0
+    : fromCents(roundHalfAwayFromZero((toCents(netAmount) * rate) / 100))
 
 /** Rates that are always listed in the breakdown, in display order. */
 const STANDARD_RATES: readonly VatRate[] = [23, 8, 5, 0, 'np']
@@ -15,33 +35,27 @@ const STANDARD_RATES: readonly VatRate[] = [23, 8, 5, 0, 'np']
 const rateOrder = (rate: VatRate): number => {
   const index = STANDARD_RATES.indexOf(rate)
   if (index !== -1) return index
-  return STANDARD_RATES.length + (rate === 'np' ? 0 : -rate)
+  // non-standard rates follow the standard ones, highest first ('np' is always standard)
+  return STANDARD_RATES.length + (typeof rate === 'number' ? 100 - rate : 0)
 }
 
 export function calculateTotals(items: readonly VatBreakdownItem[]): VatTotals {
-  const netAmount = roundMoney(
-    items.reduce((sum, item) => sum + item.netAmount, 0),
-  )
-  const vatAmount = roundMoney(
-    items.reduce((sum, item) => sum + item.vatAmount, 0),
-  )
+  const netAmount = sumMoney(items.map((item) => item.netAmount))
+  const vatAmount = sumMoney(items.map((item) => item.vatAmount))
   return {
     netAmount,
     vatAmount,
-    grossAmount: roundMoney(netAmount + vatAmount),
+    grossAmount: sumMoney([netAmount, vatAmount]),
   }
 }
 
 export function calculateDocumentTotals(
   documents: readonly VatDocument[],
 ): VatTotals {
-  const sum = (pick: (document: VatDocument) => number): number =>
-    roundMoney(documents.reduce((total, document) => total + pick(document), 0))
-
   return {
-    netAmount: sum((document) => document.netAmount),
-    vatAmount: sum((document) => document.vatAmount),
-    grossAmount: sum((document) => document.grossAmount),
+    netAmount: sumMoney(documents.map((document) => document.netAmount)),
+    vatAmount: sumMoney(documents.map((document) => document.vatAmount)),
+    grossAmount: sumMoney(documents.map((document) => document.grossAmount)),
   }
 }
 
@@ -62,8 +76,8 @@ export function aggregateVatBreakdown(
       }
       byRate.set(item.rate, {
         rate: item.rate,
-        netAmount: roundMoney(current.netAmount + item.netAmount),
-        vatAmount: roundMoney(current.vatAmount + item.vatAmount),
+        netAmount: sumMoney([current.netAmount, item.netAmount]),
+        vatAmount: sumMoney([current.vatAmount, item.vatAmount]),
       })
     }
   }

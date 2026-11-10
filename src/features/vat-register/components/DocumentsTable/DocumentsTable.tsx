@@ -2,6 +2,7 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import type { VatDocument } from '@/domain/vat'
+import type { DocumentSort, SortKey } from '../../types/sort'
 import type { DocumentTagAssignments, DocumentTagId } from '../../types/tags'
 import { DocumentTableRow } from './DocumentTableRow'
 import { DocumentsTableHead } from './DocumentsTableHead'
@@ -16,6 +17,8 @@ interface DocumentsTableProps {
   someSelected: boolean
   onToggleSelect: (id: string) => void
   onToggleSelectAll: () => void
+  sort: DocumentSort
+  onSortChange: (key: SortKey) => void
   tagAssignments: DocumentTagAssignments
   onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
 }
@@ -31,6 +34,8 @@ export function DocumentsTable({
   someSelected,
   onToggleSelect,
   onToggleSelectAll,
+  sort,
+  onSortChange,
   tagAssignments,
   onRemoveTag,
 }: DocumentsTableProps) {
@@ -40,6 +45,8 @@ export function DocumentsTable({
         <DocumentsTableHead
           allSelected={allSelected}
           someSelected={someSelected}
+          sort={sort}
+          onSortChange={onSortChange}
           onToggleSelectAll={onToggleSelectAll}
         />
         <TableBody>

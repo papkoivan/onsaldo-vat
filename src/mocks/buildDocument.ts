@@ -5,7 +5,7 @@ import type {
   VatDocument,
   VatRate,
 } from '@/domain/vat'
-import { roundMoney } from '@/utils/vatCalculations'
+import { calculateTotals, calculateVatAmount } from '@/utils/vatCalculations'
 
 export interface Contractor {
   name: string
@@ -39,7 +39,7 @@ const IDENTIFIER_PREFIX: Record<RegisterType, string> = {
 const lineToBreakdown = ({ rate, netAmount }: VatLine): VatBreakdownItem => ({
   rate,
   netAmount,
-  vatAmount: rate === 'np' ? 0 : roundMoney((netAmount * rate) / 100),
+  vatAmount: calculateVatAmount(netAmount, rate),
 })
 
 /** Stable pseudo-random hex so mock KSeF numbers do not change between reloads. */
@@ -69,12 +69,7 @@ export function buildDocument(
   index: number,
 ): VatDocument {
   const vatBreakdown = seed.lines.map(lineToBreakdown)
-  const netAmount = roundMoney(
-    vatBreakdown.reduce((sum, item) => sum + item.netAmount, 0),
-  )
-  const vatAmount = roundMoney(
-    vatBreakdown.reduce((sum, item) => sum + item.vatAmount, 0),
-  )
+  const { netAmount, vatAmount, grossAmount } = calculateTotals(vatBreakdown)
   const sequence = String(index + 1).padStart(3, '0')
   const period = seed.issueDate.slice(2, 7).replace('-', '')
   const issuerNip = register === 'sales' ? OWN_COMPANY_NIP : seed.contractor.nip
@@ -96,7 +91,7 @@ export function buildDocument(
     documentSeries: seed.documentSeries,
     netAmount,
     vatAmount,
-    grossAmount: roundMoney(netAmount + vatAmount),
+    grossAmount,
     vatBreakdown,
   }
 }

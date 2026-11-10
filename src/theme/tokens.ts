@@ -17,6 +17,8 @@ export const colors = {
   textPrimary: '#14211c',
   textSecondary: '#566660',
   border: '#dde5e1',
+  // form control outlines need 3:1 against white (WCAG 1.4.11); `border` is for decorative dividers
+  borderInput: '#7f918a',
   background: '#f7f9f8',
   surface: '#ffffff',
   surfaceMuted: '#f1f5f3',

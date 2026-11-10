@@ -1,4 +1,5 @@
 import type { VatRate } from '@/domain/vat'
+import { roundMoney } from './vatCalculations'
 
 const currencyFormatter = new Intl.NumberFormat('pl-PL', {
   style: 'currency',
@@ -56,7 +57,7 @@ export const formatDocumentCount = (count: number): string =>
 
 /** Plain amount for spreadsheets: no currency symbol or grouping, comma decimal separator. */
 export const formatAmountPlain = (value: number): string =>
-  (Math.round(value * 100) / 100).toFixed(2).replace('.', ',')
+  roundMoney(value).toFixed(2).replace('.', ',')
 
 const dateTimeFormatter = new Intl.DateTimeFormat('pl-PL', {
   day: '2-digit',

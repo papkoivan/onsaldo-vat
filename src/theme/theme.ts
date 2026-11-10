@@ -32,6 +32,31 @@ export const theme = createTheme({
         },
       },
     },
+    MuiButtonBase: {
+      styleOverrides: {
+        root: {
+          '&.Mui-focusVisible': {
+            outline: `2px solid ${colors.primary}`,
+            outlineOffset: 2,
+          },
+          // items that fill their container would have the ring clipped outside it
+          '&.MuiMenuItem-root.Mui-focusVisible, &.MuiTab-root.Mui-focusVisible':
+            { outlineOffset: -2 },
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        notchedOutline: { borderColor: colors.borderInput },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          '&::placeholder': { color: colors.textSecondary, opacity: 1 },
+        },
+      },
+    },
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {

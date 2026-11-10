@@ -8,6 +8,7 @@ import TableRow from '@mui/material/TableRow'
 import { colors } from '@/theme/tokens'
 import { visuallyHiddenSx } from '@/utils/a11y'
 import { DEFAULT_PAGE_SIZE } from '../../hooks/usePagination'
+import { DEFAULT_SORT } from '../../types/sort'
 import { DocumentsTableHead } from '../DocumentsTable/DocumentsTableHead'
 import { tableContainerSx, tableSx } from '../DocumentsTable/tableLayout'
 import {
@@ -35,6 +36,8 @@ function TableSkeleton() {
           allSelected={false}
           someSelected={false}
           disabled
+          sort={DEFAULT_SORT}
+          onSortChange={noop}
           onToggleSelectAll={noop}
         />
         <TableBody>

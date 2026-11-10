@@ -108,9 +108,9 @@ export function DocumentsPagination({ pagination }: DocumentsPaginationProps) {
             size="small"
             value={pageSize}
             onChange={(event) => setPageSize(Number(event.target.value))}
-            inputProps={{ 'aria-labelledby': PAGE_SIZE_LABEL_ID }}
+            labelId={PAGE_SIZE_LABEL_ID}
             sx={{
-              minHeight: { xs: 44, md: 36 },
+              height: { xs: 44, md: 36 },
               backgroundColor: 'background.paper',
             }}
           >

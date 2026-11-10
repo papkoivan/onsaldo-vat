@@ -94,7 +94,8 @@ function DetailSection({
     >
       <Typography
         variant="subtitle2"
-        component="h3"
+        // a card's own title is an h3, so its sections sit one level below
+        component={isCard ? 'h4' : 'h3'}
         sx={{ fontWeight: 700, mb: 1.5 }}
       >
         {title}

@@ -40,7 +40,11 @@ export function DocumentCard({
 
   // The whole header is a larger tap area; real controls keep their own behaviour.
   const handleHeaderClick = (event: MouseEvent<HTMLElement>) => {
-    if ((event.target as HTMLElement).closest('button, input, a')) return
+    if (
+      event.target instanceof Element &&
+      event.target.closest('button, input, a')
+    )
+      return
     onToggleExpand(document.id)
   }
 

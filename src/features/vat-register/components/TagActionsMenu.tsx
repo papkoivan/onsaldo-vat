@@ -65,6 +65,7 @@ export function TagActionsMenu({
           <MenuItem
             key={`add-${tag.id}`}
             disabled={missing === 0}
+            aria-label={`Dodaj oznaczenie: ${tag.label}`}
             onClick={() => onAdd(tag.id)}
             sx={itemSx}
           >
@@ -85,6 +86,7 @@ export function TagActionsMenu({
           <MenuItem
             key={`remove-${tag.id}`}
             disabled={present === 0}
+            aria-label={`Usuń oznaczenie: ${tag.label}${present > 0 ? ` (${present})` : ''}`}
             onClick={() => onRemove(tag.id)}
             sx={{ ...itemSx, justifyContent: 'space-between', gap: 2 }}
           >

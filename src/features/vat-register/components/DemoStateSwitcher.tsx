@@ -73,7 +73,12 @@ export function DemoStateSwitcher({ value, onChange }: DemoStateSwitcherProps) {
             size="small"
             label={LABEL}
             value={value}
-            onChange={(event) => onChange(event.target.value as VatViewState)}
+            onChange={(event) => {
+              const option = OPTIONS.find(
+                ({ value: candidate }) => candidate === event.target.value,
+              )
+              if (option) onChange(option.value)
+            }}
             sx={{
               '& .MuiInputBase-root': {
                 minHeight: 44,

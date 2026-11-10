@@ -1,9 +1,11 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Stack from '@mui/material/Stack'
 import type { RegisterType, VatDocument } from '@/domain/vat'
 import { downloadTextFile } from '@/utils/download'
 import { formatDocumentCount } from '@/utils/format'
 import type { FilterKey, FilterOption } from '../types/filters'
+import { DEFAULT_SORT } from '../types/sort'
+import type { SortKey } from '../types/sort'
 import { useBulkTagging } from '../hooks/useBulkTagging'
 import { useDocumentSelection } from '../hooks/useDocumentSelection'
 import type { DocumentSearchState } from '../hooks/useDocumentSearch'
@@ -19,6 +21,7 @@ import {
   buildDocumentsCsv,
   buildExportFilename,
 } from '../utils/exportDocuments'
+import { nextSort, sortDocuments } from '../utils/sortDocuments'
 import type { VatViewState } from '../types/viewState'
 import { ActiveFilters } from './ActiveFilters'
 import { BulkActionConfirmDialog } from './BulkActionConfirmDialog'
@@ -40,7 +43,7 @@ import { TagActionsMenu } from './TagActionsMenu'
 interface DocumentSectionProps {
   register: RegisterType
   companyName: string
-  /** Every document matching the search and applied filters, in display order. */
+  /** Every document matching the search and applied filters, before sorting. */
   documents: readonly VatDocument[]
   filterOptions: Record<FilterKey, readonly FilterOption[]>
   search: DocumentSearchState
@@ -63,7 +66,7 @@ const UNAVAILABLE_REASONS: Partial<Record<VatViewState, string>> = {
 export function DocumentSection({
   register,
   companyName,
-  documents,
+  documents: matchingDocuments,
   filterOptions,
   search,
   filters,
@@ -72,6 +75,15 @@ export function DocumentSection({
   onRetry,
 }: DocumentSectionProps) {
   const isMobile = useViewportDown('md')
+  const [sort, setSort] = useState(DEFAULT_SORT)
+  const documents = useMemo(
+    () => sortDocuments(matchingDocuments, sort),
+    [matchingDocuments, sort],
+  )
+  const handleSortChange = useCallback(
+    (key: SortKey) => setSort((current) => nextSort(current, key)),
+    [],
+  )
   const pagination = usePagination(documents)
   const { pageItems } = pagination
   const visibleIds = useMemo(
@@ -165,6 +177,8 @@ export function DocumentSection({
             someSelected={selection.someSelected}
             onToggleSelect={selection.toggle}
             onToggleSelectAll={selection.toggleAll}
+            sort={sort}
+            onSortChange={handleSortChange}
             tagAssignments={tags.assignments}
             onRemoveTag={bulkTagging.removeFromDocument}
           />

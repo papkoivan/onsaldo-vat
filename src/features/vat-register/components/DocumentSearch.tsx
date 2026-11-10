@@ -4,7 +4,6 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
-import { colors } from '@/theme/tokens'
 import { useViewportDown } from '../hooks/useViewportDown'
 
 interface DocumentSearchProps {
@@ -20,7 +19,8 @@ export function DocumentSearch({
   onClear,
   disabled = false,
 }: DocumentSearchProps) {
-  const compact = useViewportDown('sm')
+  // the long placeholder is clipped in the narrower tablet toolbar
+  const compact = useViewportDown('lg')
 
   return (
     <TextField
@@ -42,27 +42,27 @@ export function DocumentSearch({
               <SearchOutlined fontSize="small" />
             </InputAdornment>
           ),
-          endAdornment: value ? (
-            <InputAdornment position="end">
-              <Tooltip title="Wyczyść wyszukiwanie">
-                <IconButton
-                  size="small"
-                  edge="end"
-                  aria-label="Wyczyść wyszukiwanie"
-                  onClick={onClear}
-                >
-                  <ClearOutlined fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </InputAdornment>
-          ) : null,
+          endAdornment:
+            value && !disabled ? (
+              <InputAdornment position="end">
+                <Tooltip title="Wyczyść wyszukiwanie">
+                  <IconButton
+                    size="small"
+                    edge="end"
+                    aria-label="Wyczyść wyszukiwanie"
+                    onClick={onClear}
+                  >
+                    <ClearOutlined fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ) : null,
         },
       }}
       sx={{
         '& .MuiOutlinedInput-root': {
-          height: 40,
+          height: { xs: 44, md: 40 },
           backgroundColor: 'background.paper',
-          '& fieldset': { borderColor: colors.border },
         },
       }}
     />
