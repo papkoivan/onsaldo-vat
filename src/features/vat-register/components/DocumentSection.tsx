@@ -4,6 +4,8 @@ import type { RegisterType, VatDocument } from '@/domain/vat'
 import { downloadTextFile } from '@/utils/download'
 import { formatDocumentCount } from '@/utils/format'
 import type { FilterKey, FilterOption } from '../types/filters'
+import { DEFAULT_COLUMN_ORDER } from '../types/columns'
+import type { ColumnKey } from '../types/columns'
 import { DEFAULT_SORT } from '../types/sort'
 import type { SortKey } from '../types/sort'
 import type { DocumentSearchState } from '../hooks/useDocumentSearch'
@@ -18,6 +20,7 @@ import {
   buildDocumentsCsv,
   buildExportFilename,
 } from '../utils/exportDocuments'
+import { moveColumn } from '../utils/columnOrder'
 import { nextSort, sortDocuments } from '../utils/sortDocuments'
 import type { VatViewState } from '../types/viewState'
 import { ActiveFilters } from './ActiveFilters'
@@ -66,6 +69,12 @@ export function DocumentSection({
   )
   const handleSortChange = useCallback(
     (key: SortKey) => setSort((current) => nextSort(current, key)),
+    [],
+  )
+  const [columnOrder, setColumnOrder] = useState(DEFAULT_COLUMN_ORDER)
+  const handleColumnMove = useCallback(
+    (active: ColumnKey, over: ColumnKey) =>
+      setColumnOrder((current) => moveColumn(current, active, over)),
     [],
   )
   const pagination = usePagination(documents)
@@ -124,6 +133,8 @@ export function DocumentSection({
         ) : (
           <DocumentsTable
             documents={pageItems}
+            columnOrder={columnOrder}
+            onColumnMove={handleColumnMove}
             expandedIds={expanded.expandedIds}
             onToggleExpand={expanded.toggle}
             sort={sort}

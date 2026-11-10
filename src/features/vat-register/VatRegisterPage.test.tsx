@@ -233,14 +233,27 @@ describe('sorting', () => {
     const before = summaryText()
     const header = screen.getByRole('columnheader', { name: /Numer dokumentu/ })
 
-    await user.click(within(header).getByRole('button'))
+    await user.click(
+      within(header).getByRole('button', { name: /^Numer dokumentu/ }),
+    )
     expect(header).toHaveAttribute('aria-sort', 'ascending')
     const ascending = firstRowContractor()
 
-    await user.click(within(header).getByRole('button'))
+    await user.click(
+      within(header).getByRole('button', { name: /^Numer dokumentu/ }),
+    )
     expect(header).toHaveAttribute('aria-sort', 'descending')
     expect(firstRowContractor()).not.toBe(ascending)
     expect(summaryText()).toBe(before)
+  })
+
+  it('offers a keyboard-focusable drag handle for every reorderable column', () => {
+    setup()
+    const handle = screen.getByRole('button', {
+      name: 'Przesuń kolumnę Kontrahent',
+    })
+    expect(handle).toHaveAttribute('aria-roledescription', 'sortable')
+    expect(handle).not.toHaveAttribute('tabindex', '-1')
   })
 
   it('marks the newest-first date order as the default', () => {

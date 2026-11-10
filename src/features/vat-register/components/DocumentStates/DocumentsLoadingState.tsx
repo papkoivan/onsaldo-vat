@@ -8,7 +8,10 @@ import TableRow from '@mui/material/TableRow'
 import { colors } from '@/theme/tokens'
 import { visuallyHiddenSx } from '@/utils/a11y'
 import { DEFAULT_PAGE_SIZE } from '../../hooks/usePagination'
+import { DEFAULT_COLUMN_ORDER } from '../../types/columns'
+import type { ColumnKey } from '../../types/columns'
 import { DEFAULT_SORT } from '../../types/sort'
+import { TABLE_COLUMNS } from '../DocumentsTable/columns'
 import { DocumentsTableHead } from '../DocumentsTable/DocumentsTableHead'
 import { tableContainerSx, tableSx } from '../DocumentsTable/tableLayout'
 import { desktopOnlyCellSx } from '../tableStyles'
@@ -19,6 +22,8 @@ interface DocumentsLoadingStateProps {
 
 const ROWS = Array.from({ length: DEFAULT_PAGE_SIZE }, (_, index) => index)
 const noop = () => undefined
+const SKELETON_COLUMNS = DEFAULT_COLUMN_ORDER.map((key) => TABLE_COLUMNS[key])
+const NO_REORDERABLE_KEYS: ReadonlySet<ColumnKey> = new Set()
 
 function TextSkeleton({ width }: { width: number | string }) {
   return <Skeleton variant="text" width={width} sx={{ maxWidth: '100%' }} />
@@ -28,7 +33,13 @@ function TableSkeleton() {
   return (
     <TableContainer sx={tableContainerSx}>
       <Table size="small" sx={tableSx}>
-        <DocumentsTableHead disabled sort={DEFAULT_SORT} onSortChange={noop} />
+        <DocumentsTableHead
+          disabled
+          columns={SKELETON_COLUMNS}
+          reorderableKeys={NO_REORDERABLE_KEYS}
+          sort={DEFAULT_SORT}
+          onSortChange={noop}
+        />
         <TableBody>
           {ROWS.map((row) => (
             <TableRow key={row} sx={{ height: 52 }}>
