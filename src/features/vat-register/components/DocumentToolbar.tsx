@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { MouseEvent } from 'react'
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
+import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import Box from '@mui/material/Box'
@@ -146,6 +147,12 @@ export function DocumentToolbar({
           open={menuAnchor !== null}
           onClose={closeMenu}
         >
+          <MenuItem sx={menuItemSx}>
+            <ListItemIcon>
+              <LocalOfferOutlined fontSize="small" />
+            </ListItemIcon>
+            Etykiety
+          </MenuItem>
           <MenuItem
             disabled={!onPrint}
             onClick={handleMenuAction(onPrint)}
