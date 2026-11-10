@@ -101,13 +101,26 @@ export function DocumentToolbar({
             minWidth: 0,
             px: { xs: 1.5, md: 2 },
             height: buttonSize,
-            color: 'primary.main',
-            borderColor: 'primary.main',
-            backgroundColor: 'primary.light',
-            '&:hover': {
-              borderColor: 'primary.dark',
-              backgroundColor: 'primary.light',
-            },
+            ...(activeFilterCount > 0
+              ? {
+                  color: 'primary.main',
+                  borderColor: 'primary.main',
+                  backgroundColor: 'primary.light',
+                  '&:hover': {
+                    borderColor: 'primary.dark',
+                    backgroundColor: 'primary.light',
+                  },
+                }
+              : {
+                  color: 'text.primary',
+                  borderColor: colors.border,
+                  backgroundColor: 'background.paper',
+                  '&:hover': {
+                    borderColor: colors.border,
+                    backgroundColor: colors.surfaceMuted,
+                  },
+                  '&.Mui-disabled': { backgroundColor: colors.surfaceMuted },
+                }),
           }}
         >
           {activeFilterCount > 0 ? `Filtry (${activeFilterCount})` : 'Filtry'}
