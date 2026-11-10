@@ -1,10 +1,22 @@
 import { useCallback, useMemo, useState } from 'react'
 
-/** Selection is tracked by id; only ids present in `visibleIds` are reported. */
-export function useDocumentSelection(visibleIds: readonly string[]) {
+/**
+ * Selection is tracked by id; only ids present in `visibleIds` are reported.
+ * It is dropped whenever `resetKey` changes (another register or dataset).
+ */
+export function useDocumentSelection(
+  visibleIds: readonly string[],
+  resetKey: string,
+) {
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   )
+  const [trackedKey, setTrackedKey] = useState(resetKey)
+
+  if (trackedKey !== resetKey) {
+    setTrackedKey(resetKey)
+    setSelectedIds(new Set())
+  }
 
   const selectedVisibleCount = useMemo(
     () => visibleIds.filter((id) => selectedIds.has(id)).length,

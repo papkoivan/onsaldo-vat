@@ -5,11 +5,21 @@ const SEARCH_DEBOUNCE_MS = 300
 
 export function useDocumentSearch() {
   const [inputValue, setInputValue] = useState('')
-  const query = useDebouncedValue(inputValue.trim(), SEARCH_DEBOUNCE_MS)
+  // a value applied without waiting for the debounce (programmatic changes, clearing)
+  const [appliedNow, setAppliedNow] = useState<string | null>(null)
 
-  const clear = useCallback(() => setInputValue(''), [])
+  const trimmed = inputValue.trim()
+  const debounced = useDebouncedValue(trimmed, SEARCH_DEBOUNCE_MS)
+  const query = appliedNow === trimmed ? trimmed : debounced
 
-  return { inputValue, setInputValue, query, clear }
+  const setValueNow = useCallback((value: string) => {
+    setInputValue(value)
+    setAppliedNow(value.trim())
+  }, [])
+
+  const clear = useCallback(() => setValueNow(''), [setValueNow])
+
+  return { inputValue, setInputValue, setValueNow, query, clear }
 }
 
 export type DocumentSearchState = ReturnType<typeof useDocumentSearch>

@@ -19,12 +19,17 @@ import {
   buildDocumentsCsv,
   buildExportFilename,
 } from '../utils/exportDocuments'
+import type { VatViewState } from '../types/viewState'
 import { ActiveFilters } from './ActiveFilters'
 import { BulkActionConfirmDialog } from './BulkActionConfirmDialog'
 import { BulkActionsBar } from './BulkActionsBar'
 import { DocumentsList } from './DocumentsList/DocumentsList'
 import { DocumentsPagination } from './DocumentsPagination'
 import { DocumentsTable } from './DocumentsTable/DocumentsTable'
+import { DocumentsErrorState } from './DocumentStates/DocumentsErrorState'
+import { DocumentsLoadingState } from './DocumentStates/DocumentsLoadingState'
+import { EmptyRegisterState } from './DocumentStates/EmptyRegisterState'
+import { NoResultsState } from './DocumentStates/NoResultsState'
 import { DocumentSectionHeader } from './DocumentSectionHeader'
 import { DocumentToolbar } from './DocumentToolbar'
 import { FeedbackSnackbar } from './FeedbackSnackbar'
@@ -40,9 +45,20 @@ interface DocumentSectionProps {
   filterOptions: Record<FilterKey, readonly FilterOption[]>
   search: DocumentSearchState
   filters: VatFiltersState
+  viewState: VatViewState
+  /** Changes when the underlying dataset changes; visible selection is dropped then. */
+  dataScope: string
+  onRetry: () => void
 }
 
 const TITLE_ID = 'documents-section-title'
+
+const UNAVAILABLE_REASONS: Partial<Record<VatViewState, string>> = {
+  empty: 'rejestr nie zawiera dokumentów',
+  'no-results': 'brak dokumentów spełniających kryteria',
+  loading: 'trwa ładowanie danych',
+  error: 'dane są niedostępne',
+}
 
 export function DocumentSection({
   register,
@@ -51,6 +67,9 @@ export function DocumentSection({
   filterOptions,
   search,
   filters,
+  viewState,
+  dataScope,
+  onRetry,
 }: DocumentSectionProps) {
   const isMobile = useViewportDown('md')
   const pagination = usePagination(documents)
@@ -60,7 +79,7 @@ export function DocumentSection({
     [pageItems],
   )
   const expanded = useExpandedDocuments()
-  const selection = useDocumentSelection(visibleIds)
+  const selection = useDocumentSelection(visibleIds, `${register}:${dataScope}`)
   const tags = useDocumentTags()
   const feedback = useFeedback()
   const { printedAt, print } = usePrintView()
@@ -82,9 +101,75 @@ export function DocumentSection({
   const hasDocuments = documents.length > 0
   const hasSelection = selectedDocuments.length > 0
 
+  const isFilled = viewState === 'filled'
+  // nothing to search or filter while the register is empty, loading or failed
+  const toolbarDisabled =
+    viewState === 'empty' || viewState === 'loading' || viewState === 'error'
+
   const handleResetAll = () => {
     search.clear()
     filters.clearAll()
+  }
+
+  // the control that was just used disappears; keep keyboard and screen reader users anchored
+  const focusTitle = () => document.getElementById(TITLE_ID)?.focus()
+
+  const renderDocuments = () => {
+    switch (viewState) {
+      case 'loading':
+        return <DocumentsLoadingState layout={isMobile ? 'cards' : 'table'} />
+      case 'error':
+        return (
+          <DocumentsErrorState
+            onRetry={() => {
+              onRetry()
+              focusTitle()
+            }}
+          />
+        )
+      case 'empty':
+        return <EmptyRegisterState register={register} />
+      case 'no-results':
+        return (
+          <NoResultsState
+            searchQuery={search.query}
+            hasActiveFilters={filters.activeFilters.length > 0}
+            onClearSearch={() => {
+              search.clear()
+              focusTitle()
+            }}
+            onClearFilters={() => {
+              filters.clearAll()
+              focusTitle()
+            }}
+          />
+        )
+      case 'filled':
+        return isMobile ? (
+          <DocumentsList
+            documents={pageItems}
+            expandedIds={expanded.expandedIds}
+            onToggleExpand={expanded.toggle}
+            selectedIds={selection.selectedIds}
+            onToggleSelect={selection.toggle}
+            tagAssignments={tags.assignments}
+            onRemoveTag={bulkTagging.removeFromDocument}
+          />
+        ) : (
+          <DocumentsTable
+            documents={pageItems}
+            expandedIds={expanded.expandedIds}
+            onToggleExpand={expanded.toggle}
+            selectedIds={selection.selectedIds}
+            allSelected={selection.allSelected}
+            someSelected={selection.someSelected}
+            onToggleSelect={selection.toggle}
+            onToggleSelectAll={selection.toggleAll}
+            tagAssignments={tags.assignments}
+            onRemoveTag={bulkTagging.removeFromDocument}
+          />
+        )
+    }
   }
 
   const exportDocuments = (
@@ -121,13 +206,20 @@ export function DocumentSection({
       <DocumentSectionHeader
         titleId={TITLE_ID}
         title="Dokumenty"
-        count={documents.length}
+        count={
+          viewState === 'loading' || viewState === 'error'
+            ? null
+            : documents.length
+        }
+        loading={viewState === 'loading'}
       />
       <DocumentToolbar
+        disabled={toolbarDisabled}
+        unavailableReason={UNAVAILABLE_REASONS[viewState]}
         searchValue={search.inputValue}
         onSearchChange={search.setInputValue}
         onSearchClear={search.clear}
-        activeFilterCount={filters.activeFilters.length}
+        activeFilterCount={toolbarDisabled ? 0 : filters.activeFilters.length}
         onOpenFilters={filters.openDrawer}
         onPrint={hasDocuments ? print : undefined}
         onExport={hasDocuments ? () => exportDocuments(documents) : undefined}
@@ -148,37 +240,16 @@ export function DocumentSection({
         onClearSelection={selection.clear}
       />
       <ActiveFilters
-        filters={filters.activeFilters}
+        filters={
+          viewState === 'filled' || viewState === 'no-results'
+            ? filters.activeFilters
+            : []
+        }
         onRemove={filters.removeFilter}
         onClearAll={filters.clearAll}
       />
-      {isMobile ? (
-        <DocumentsList
-          documents={pageItems}
-          expandedIds={expanded.expandedIds}
-          onToggleExpand={expanded.toggle}
-          selectedIds={selection.selectedIds}
-          onToggleSelect={selection.toggle}
-          tagAssignments={tags.assignments}
-          onRemoveTag={bulkTagging.removeFromDocument}
-          onResetFilters={canResetAll ? handleResetAll : undefined}
-        />
-      ) : (
-        <DocumentsTable
-          documents={pageItems}
-          expandedIds={expanded.expandedIds}
-          onToggleExpand={expanded.toggle}
-          selectedIds={selection.selectedIds}
-          allSelected={selection.allSelected}
-          someSelected={selection.someSelected}
-          onToggleSelect={selection.toggle}
-          onToggleSelectAll={selection.toggleAll}
-          tagAssignments={tags.assignments}
-          onRemoveTag={bulkTagging.removeFromDocument}
-          onResetFilters={canResetAll ? handleResetAll : undefined}
-        />
-      )}
-      <DocumentsPagination pagination={pagination} />
+      {renderDocuments()}
+      {isFilled && <DocumentsPagination pagination={pagination} />}
       <FiltersDrawer
         open={filters.isDrawerOpen}
         values={filters.draftFilters}
@@ -205,7 +276,7 @@ export function DocumentSection({
         onCancel={bulkTagging.cancel}
       />
       <FeedbackSnackbar feedback={feedback.feedback} onClose={feedback.close} />
-      {printedAt && (
+      {printedAt && isFilled && (
         <PrintView
           companyName={companyName}
           register={register}

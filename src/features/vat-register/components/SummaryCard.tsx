@@ -1,16 +1,20 @@
 import type { ReactNode } from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
+import Skeleton from '@mui/material/Skeleton'
 import Typography from '@mui/material/Typography'
+import { visuallyHiddenSx } from '@/utils/a11y'
 import { formatCurrency } from '@/utils/format'
+import type { DataStatus } from '../types/viewState'
 
 interface SummaryCardProps {
   label: string
   value: number
   icon: ReactNode
+  status: DataStatus
 }
 
-export function SummaryCard({ label, value, icon }: SummaryCardProps) {
+export function SummaryCard({ label, value, icon, status }: SummaryCardProps) {
   return (
     <Paper
       variant="outlined"
@@ -55,7 +59,23 @@ export function SummaryCard({ label, value, icon }: SummaryCardProps) {
             whiteSpace: 'nowrap',
           }}
         >
-          {formatCurrency(value)}
+          {status === 'ready' && formatCurrency(value)}
+          {status === 'loading' && (
+            <>
+              <Skeleton width={150} sx={{ maxWidth: '100%' }} />
+              <Box component="span" sx={visuallyHiddenSx}>
+                Ładowanie…
+              </Box>
+            </>
+          )}
+          {status === 'unavailable' && (
+            <>
+              <span aria-hidden>—</span>
+              <Box component="span" sx={visuallyHiddenSx}>
+                Brak danych
+              </Box>
+            </>
+          )}
         </Typography>
       </Box>
     </Paper>

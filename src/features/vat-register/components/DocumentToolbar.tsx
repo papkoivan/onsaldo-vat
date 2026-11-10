@@ -21,6 +21,10 @@ import { useViewportDown } from '../hooks/useViewportDown'
 import { DocumentSearch } from './DocumentSearch'
 
 interface DocumentToolbarProps {
+  /** Search, filters and the actions menu are unavailable (no data to work on). */
+  disabled?: boolean
+  /** Replaces the default tooltip hint on actions that need documents. */
+  unavailableReason?: string
   searchValue: string
   onSearchChange: (value: string) => void
   onSearchClear: () => void
@@ -90,6 +94,8 @@ function ToolbarIconButton({
 }
 
 export function DocumentToolbar({
+  disabled = false,
+  unavailableReason,
   searchValue,
   onSearchChange,
   onSearchClear,
@@ -136,6 +142,7 @@ export function DocumentToolbar({
           value={searchValue}
           onChange={onSearchChange}
           onClear={onSearchClear}
+          disabled={disabled}
         />
       </Box>
 
@@ -151,6 +158,7 @@ export function DocumentToolbar({
           variant="outlined"
           startIcon={<FilterAltOutlined />}
           onClick={onOpenFilters}
+          disabled={disabled}
           aria-haspopup="dialog"
           sx={{
             flexGrow: { xs: 1, md: 0 },
@@ -174,25 +182,26 @@ export function DocumentToolbar({
               label="Oznacz dokumenty"
               icon={<LocalOfferOutlined />}
               onClick={onTag && ((event) => onTag(event.currentTarget))}
-              disabledHint="najpierw zaznacz dokumenty"
+              disabledHint={unavailableReason ?? 'najpierw zaznacz dokumenty'}
             />
             <ToolbarIconButton
               label="Drukuj"
               icon={<PrintOutlined />}
               onClick={onPrint}
-              disabledHint="brak dokumentów do wydruku"
+              disabledHint={unavailableReason ?? 'brak dokumentów do wydruku'}
             />
             <ToolbarIconButton
               label="Eksportuj do CSV"
               icon={<FileDownloadOutlined />}
               onClick={onExport}
-              disabledHint="brak dokumentów do eksportu"
+              disabledHint={unavailableReason ?? 'brak dokumentów do eksportu'}
             />
           </>
         )}
         <Tooltip title="Więcej akcji">
           <IconButton
             aria-label="Więcej akcji"
+            disabled={disabled}
             aria-haspopup="menu"
             aria-expanded={menuAnchor ? true : undefined}
             aria-controls={menuAnchor ? 'document-more-menu' : undefined}

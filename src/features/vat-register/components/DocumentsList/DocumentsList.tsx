@@ -1,8 +1,6 @@
 import Box from '@mui/material/Box'
 import type { VatDocument } from '@/domain/vat'
 import type { DocumentTagAssignments, DocumentTagId } from '../../types/tags'
-import { colors } from '@/theme/tokens'
-import { DocumentsEmptyState } from '../DocumentsEmptyState'
 import { DocumentCard } from './DocumentCard'
 
 interface DocumentsListProps {
@@ -13,8 +11,6 @@ interface DocumentsListProps {
   onToggleSelect: (id: string) => void
   tagAssignments: DocumentTagAssignments
   onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
-  /** Undefined when there is nothing to reset. */
-  onResetFilters?: () => void
 }
 
 const NO_TAGS: readonly DocumentTagId[] = []
@@ -27,22 +23,7 @@ export function DocumentsList({
   onToggleSelect,
   tagAssignments,
   onRemoveTag,
-  onResetFilters,
 }: DocumentsListProps) {
-  if (documents.length === 0) {
-    return (
-      <Box
-        sx={{
-          border: `1px solid ${colors.border}`,
-          borderRadius: '12px',
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <DocumentsEmptyState onResetFilters={onResetFilters} />
-      </Box>
-    )
-  }
-
   return (
     <Box
       component="ul"

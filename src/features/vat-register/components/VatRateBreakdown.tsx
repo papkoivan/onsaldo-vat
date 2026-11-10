@@ -6,6 +6,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
+import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -18,10 +19,13 @@ import type { VatBreakdownItem, VatBreakdownRow, VatTotals } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
 import { formatCurrency, formatPercent, formatVatRate } from '@/utils/format'
 import { buildBreakdownRows, calculateTotals } from '@/utils/vatCalculations'
+import { visuallyHiddenSx } from '@/utils/a11y'
+import type { DataStatus } from '../types/viewState'
 import { useViewportDown } from '../hooks/useViewportDown'
 
 interface VatRateBreakdownProps {
   items: readonly VatBreakdownItem[]
+  status: DataStatus
 }
 
 const numericCellSx = {
@@ -139,7 +143,31 @@ function BreakdownList({
   )
 }
 
-export function VatRateBreakdown({ items }: VatRateBreakdownProps) {
+function BreakdownLoading() {
+  return (
+    <Box>
+      <Box role="status" sx={visuallyHiddenSx}>
+        Ładowanie kwot według stawek VAT…
+      </Box>
+      <Box aria-hidden sx={{ display: 'grid', gap: 1 }}>
+        {Array.from({ length: 6 }, (_, index) => (
+          <Skeleton key={index} variant="rounded" height={36} />
+        ))}
+      </Box>
+    </Box>
+  )
+}
+
+function BreakdownUnavailable() {
+  return (
+    <Typography color="text.secondary" sx={{ px: 1, py: 2 }}>
+      Kwoty według stawek VAT są niedostępne, ponieważ nie udało się załadować
+      dokumentów.
+    </Typography>
+  )
+}
+
+export function VatRateBreakdown({ items, status }: VatRateBreakdownProps) {
   const compact = useViewportDown('sm')
   const rows = useMemo(() => buildBreakdownRows(items), [items])
   const totals = useMemo(() => calculateTotals(items), [items])
@@ -172,7 +200,11 @@ export function VatRateBreakdown({ items }: VatRateBreakdownProps) {
         </Typography>
       </AccordionSummary>
       <AccordionDetails sx={{ px: { xs: 1, md: 2 }, pt: 0, pb: 2 }}>
-        {compact ? (
+        {status === 'loading' ? (
+          <BreakdownLoading />
+        ) : status === 'unavailable' ? (
+          <BreakdownUnavailable />
+        ) : compact ? (
           <BreakdownList rows={rows} totals={totals} />
         ) : (
           <TableContainer>

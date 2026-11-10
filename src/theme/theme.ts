@@ -23,7 +23,10 @@ export const theme = createTheme({
         // The print view lives in #print-root: invisible on screen, and the only thing printed.
         '#print-root': { display: 'none' },
         '@media print': {
-          'body > :not(#print-root)': { display: 'none !important' },
+          // only when the print view exists; otherwise the page itself prints
+          'body:has(#print-root > *) > :not(#print-root)': {
+            display: 'none !important',
+          },
           '#print-root': { display: 'block' },
           body: { minWidth: 0, backgroundColor: '#ffffff' },
         },

@@ -3,17 +3,20 @@ import PaidOutlined from '@mui/icons-material/PaidOutlined'
 import PercentOutlined from '@mui/icons-material/PercentOutlined'
 import Box from '@mui/material/Box'
 import type { VatTotals } from '@/domain/vat'
+import type { DataStatus } from '../types/viewState'
 import { SummaryCard } from './SummaryCard'
 
 interface VatSummaryProps {
   totals: VatTotals
+  status: DataStatus
 }
 
-export function VatSummary({ totals }: VatSummaryProps) {
+export function VatSummary({ totals, status }: VatSummaryProps) {
   return (
     <Box
       component="section"
       aria-label="Podsumowanie finansowe"
+      aria-busy={status === 'loading'}
       sx={{
         display: 'grid',
         gridTemplateColumns: {
@@ -30,16 +33,19 @@ export function VatSummary({ totals }: VatSummaryProps) {
         label="Netto"
         value={totals.netAmount}
         icon={<PaidOutlined />}
+        status={status}
       />
       <SummaryCard
         label="VAT"
         value={totals.vatAmount}
         icon={<PercentOutlined />}
+        status={status}
       />
       <SummaryCard
         label="Brutto"
         value={totals.grossAmount}
         icon={<CalculateOutlined />}
+        status={status}
       />
     </Box>
   )

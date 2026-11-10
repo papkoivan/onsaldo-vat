@@ -11,12 +11,14 @@ interface DocumentSearchProps {
   value: string
   onChange: (value: string) => void
   onClear: () => void
+  disabled?: boolean
 }
 
 export function DocumentSearch({
   value,
   onChange,
   onClear,
+  disabled = false,
 }: DocumentSearchProps) {
   const compact = useViewportDown('sm')
 
@@ -31,6 +33,7 @@ export function DocumentSearch({
       }
       size="small"
       fullWidth
+      disabled={disabled}
       slotProps={{
         htmlInput: { 'aria-label': 'Szukaj dokumentów' },
         input: {
