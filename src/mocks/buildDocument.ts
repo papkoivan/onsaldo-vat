@@ -31,8 +31,8 @@ export interface DocumentSeed {
 export const OWN_COMPANY_NIP = '5250000000'
 
 const IDENTIFIER_PREFIX: Record<RegisterType, string> = {
-  sales: 'SPR',
-  purchases: 'ZAK',
+  sales: 'DEMO-S',
+  purchases: 'DEMO-P',
 }
 
 const lineToBreakdown = ({ rate, netAmount }: VatLine): VatBreakdownItem => ({
@@ -80,7 +80,6 @@ export function buildDocument(
   const vatBreakdown = seed.lines.map(lineToBreakdown)
   const { netAmount, vatAmount, grossAmount } = calculateTotals(vatBreakdown)
   const sequence = String(index + 1).padStart(3, '0')
-  const period = seed.issueDate.slice(2, 7).replace('-', '')
   const issuerNip = register === 'sales' ? OWN_COMPANY_NIP : seed.contractor.nip
   const documentNumber = buildDocumentNumber(seed)
 
@@ -97,7 +96,7 @@ export function buildDocument(
         ? buildKsefNumber(issuerNip, seed, documentNumber)
         : null,
     ksefStatus: seed.ksefStatus,
-    identifier: `${IDENTIFIER_PREFIX[register]}-${period}-${sequence}`,
+    identifier: `${IDENTIFIER_PREFIX[register]}-${index + 1}`,
     operationType: seed.operationType,
     jpkCode: seed.jpkCode,
     documentSeries: seed.documentSeries,
