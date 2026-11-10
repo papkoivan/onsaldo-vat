@@ -9,7 +9,9 @@ import Typography from '@mui/material/Typography'
 import type { VatDocument } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
 import { formatCurrency, formatDate } from '@/utils/format'
+import type { DocumentTagId } from '../../types/tags'
 import { DocumentDetails } from '../DocumentDetails'
+import { DocumentTagChips } from '../DocumentTagChips'
 import { KsefStatusChip } from '../KsefStatusChip'
 
 interface DocumentCardProps {
@@ -18,6 +20,8 @@ interface DocumentCardProps {
   selected: boolean
   onToggleExpand: (id: string) => void
   onToggleSelect: (id: string) => void
+  tags: readonly DocumentTagId[]
+  onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
 }
 
 const TOUCH_TARGET = 44
@@ -28,6 +32,8 @@ export function DocumentCard({
   selected,
   onToggleExpand,
   onToggleSelect,
+  tags,
+  onRemoveTag,
 }: DocumentCardProps) {
   const detailsId = `document-details-${document.id}`
   const expandLabel = `${expanded ? 'Zwiń' : 'Rozwiń'} szczegóły dokumentu ${document.documentNumber}`
@@ -95,6 +101,11 @@ export function DocumentCard({
           <Typography variant="body2" color="text.secondary">
             {formatDate(document.issueDate)}
           </Typography>
+          {tags.length > 0 && (
+            <Box sx={{ mt: 0.75 }}>
+              <DocumentTagChips tagIds={tags} />
+            </Box>
+          )}
         </Box>
         <Tooltip title={expanded ? 'Zwiń szczegóły' : 'Rozwiń szczegóły'}>
           <IconButton
@@ -139,7 +150,13 @@ export function DocumentCard({
         </Box>
       </Box>
       <Collapse in={expanded} timeout="auto">
-        <DocumentDetails document={document} id={detailsId} variant="card" />
+        <DocumentDetails
+          document={document}
+          id={detailsId}
+          variant="card"
+          tags={tags}
+          onRemoveTag={(tagId) => onRemoveTag(document, tagId)}
+        />
       </Collapse>
     </Box>
   )

@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import type { MouseEvent, ReactElement } from 'react'
+import CheckBoxOutlined from '@mui/icons-material/CheckBoxOutlined'
+import ClearOutlined from '@mui/icons-material/ClearOutlined'
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined'
-import CheckBoxOutlined from '@mui/icons-material/CheckBoxOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
 import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -25,11 +26,16 @@ interface DocumentToolbarProps {
   onSearchClear: () => void
   activeFilterCount: number
   onOpenFilters: () => void
-  onPrint: () => void
-  /** Undefined until documents are available — the action stays disabled. */
+  /** Undefined when there are no documents to print — the action stays disabled. */
+  onPrint?: () => void
+  /** Undefined when there are no documents to export — the action stays disabled. */
   onExport?: () => void
-  /** Undefined until document selection is available — the action stays disabled. */
-  onTag?: () => void
+  /** Undefined while nothing is selected. */
+  onExportSelected?: () => void
+  /** Undefined while nothing is selected. Receives the element to anchor the tag menu to. */
+  onTag?: (anchor: HTMLElement) => void
+  /** Undefined while nothing is selected. */
+  onClearSelection?: () => void
   /** Undefined when there are no documents to select. */
   onSelectAll?: () => void
   canResetAll: boolean
@@ -39,7 +45,7 @@ interface DocumentToolbarProps {
 interface ToolbarIconButtonProps {
   label: string
   icon: ReactElement
-  onClick?: () => void
+  onClick?: (event: MouseEvent<HTMLElement>) => void
   disabledHint: string
 }
 
@@ -91,7 +97,9 @@ export function DocumentToolbar({
   onOpenFilters,
   onPrint,
   onExport,
+  onExportSelected,
   onTag,
+  onClearSelection,
   onSelectAll,
   canResetAll,
   onResetAll,
@@ -100,19 +108,16 @@ export function DocumentToolbar({
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const closeMenu = () => setMenuAnchor(null)
 
-  const handleResetAll = () => {
-    closeMenu()
-    onResetAll()
-  }
-
   const handleMenuAction = (action?: () => void) => () => {
     closeMenu()
     action?.()
   }
 
-  const handleSelectAll = () => {
+  // On phones the tag menu opens from the "more" button, which stays in the layout.
+  const handleMenuTag = () => {
+    const anchor = menuAnchor
     closeMenu()
-    onSelectAll?.()
+    if (anchor) onTag?.(anchor)
   }
 
   return (
@@ -168,20 +173,20 @@ export function DocumentToolbar({
             <ToolbarIconButton
               label="Oznacz dokumenty"
               icon={<LocalOfferOutlined />}
-              onClick={onTag}
-              disabledHint="najpierw zaznacz dokumenty (wkrótce)"
+              onClick={onTag && ((event) => onTag(event.currentTarget))}
+              disabledHint="najpierw zaznacz dokumenty"
             />
             <ToolbarIconButton
               label="Drukuj"
               icon={<PrintOutlined />}
               onClick={onPrint}
-              disabledHint=""
+              disabledHint="brak dokumentów do wydruku"
             />
             <ToolbarIconButton
               label="Eksportuj do CSV"
               icon={<FileDownloadOutlined />}
               onClick={onExport}
-              disabledHint="dostępne po wczytaniu dokumentów (wkrótce)"
+              disabledHint="brak dokumentów do eksportu"
             />
           </>
         )}
@@ -209,23 +214,24 @@ export function DocumentToolbar({
             <MenuItem
               key="tag"
               disabled={!onTag}
-              onClick={handleMenuAction(onTag)}
+              onClick={handleMenuTag}
               sx={menuItemSx}
             >
               <ListItemIcon>
                 <LocalOfferOutlined fontSize="small" />
               </ListItemIcon>
-              Oznacz dokumenty
+              Oznacz zaznaczone dokumenty
             </MenuItem>,
             <MenuItem
               key="print"
+              disabled={!onPrint}
               onClick={handleMenuAction(onPrint)}
               sx={menuItemSx}
             >
               <ListItemIcon>
                 <PrintOutlined fontSize="small" />
               </ListItemIcon>
-              Drukuj
+              Drukuj wyniki
             </MenuItem>,
             <MenuItem
               key="export"
@@ -236,29 +242,50 @@ export function DocumentToolbar({
               <ListItemIcon>
                 <FileDownloadOutlined fontSize="small" />
               </ListItemIcon>
-              Eksportuj do CSV
+              Eksportuj wyniki (CSV)
             </MenuItem>,
             <Divider key="divider" />,
           ]}
           <MenuItem
-            disabled={!canResetAll}
-            onClick={handleResetAll}
+            disabled={!onExportSelected}
+            onClick={handleMenuAction(onExportSelected)}
             sx={menuItemSx}
           >
             <ListItemIcon>
-              <RestartAltOutlined fontSize="small" />
+              <FileDownloadOutlined fontSize="small" />
             </ListItemIcon>
-            Wyczyść wyszukiwanie i filtry
+            Eksportuj zaznaczone (CSV)
           </MenuItem>
           <MenuItem
             disabled={!onSelectAll}
-            onClick={handleSelectAll}
+            onClick={handleMenuAction(onSelectAll)}
             sx={menuItemSx}
           >
             <ListItemIcon>
               <CheckBoxOutlined fontSize="small" />
             </ListItemIcon>
             Zaznacz wszystkie widoczne
+          </MenuItem>
+          <MenuItem
+            disabled={!onClearSelection}
+            onClick={handleMenuAction(onClearSelection)}
+            sx={menuItemSx}
+          >
+            <ListItemIcon>
+              <ClearOutlined fontSize="small" />
+            </ListItemIcon>
+            Wyczyść zaznaczenie
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            disabled={!canResetAll}
+            onClick={handleMenuAction(onResetAll)}
+            sx={menuItemSx}
+          >
+            <ListItemIcon>
+              <RestartAltOutlined fontSize="small" />
+            </ListItemIcon>
+            Wyczyść wyszukiwanie i filtry
           </MenuItem>
         </Menu>
       </Box>

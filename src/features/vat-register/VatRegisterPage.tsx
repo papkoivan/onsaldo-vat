@@ -20,6 +20,8 @@ const headerBadges: readonly PageHeaderBadge[] = [
   { label: 'DEMO', tone: 'neutral' },
 ]
 
+const COMPANY_NAME = 'Onsaldo Preview Sp. z o.o.'
+
 export function VatRegisterPage() {
   const [register, setRegister] = useState<RegisterType>('sales')
   const search = useDocumentSearch()
@@ -51,7 +53,7 @@ export function VatRegisterPage() {
     >
       <Stack spacing={{ xs: 2, md: 2.5 }}>
         <PageHeader
-          companyName="Onsaldo Preview Sp. z o.o."
+          companyName={COMPANY_NAME}
           title="Rejestry i VAT"
           subtitle="Sprzedaż i zakupy w wybranym okresie — podgląd danych demonstracyjnych."
           badges={headerBadges}
@@ -66,6 +68,8 @@ export function VatRegisterPage() {
           <VatRateBreakdown items={breakdown} />
         </Stack>
         <DocumentSection
+          register={register}
+          companyName={COMPANY_NAME}
           documents={documents}
           filterOptions={getFilterOptions(register)}
           search={search}

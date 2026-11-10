@@ -16,6 +16,32 @@ interface DocumentsPaginationProps {
   pagination: PaginationState
 }
 
+const PAGINATION_LABELS = {
+  first: 'Pierwsza strona',
+  last: 'Ostatnia strona',
+  next: 'Następna strona',
+  previous: 'Poprzednia strona',
+} as const
+
+function getPaginationItemLabel(
+  type:
+    | 'page'
+    | 'first'
+    | 'last'
+    | 'next'
+    | 'previous'
+    | 'start-ellipsis'
+    | 'end-ellipsis',
+  page: number | null,
+  selected: boolean,
+): string {
+  if (type === 'page')
+    return `${selected ? 'Strona' : 'Przejdź do strony'} ${page}`
+  if (type === 'start-ellipsis' || type === 'end-ellipsis')
+    return 'Więcej stron'
+  return PAGINATION_LABELS[type]
+}
+
 const PAGE_SIZE_LABEL_ID = 'documents-page-size-label'
 const compactButtonSx = {
   width: 44,
@@ -144,6 +170,7 @@ export function DocumentsPagination({ pagination }: DocumentsPaginationProps) {
           page={page}
           onChange={(_event, next) => setPage(next)}
           shape="rounded"
+          getItemAriaLabel={getPaginationItemLabel}
           color="primary"
         />
       )}

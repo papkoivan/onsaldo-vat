@@ -20,6 +20,13 @@ export const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: { minWidth: layout.minViewportWidth },
+        // The print view lives in #print-root: invisible on screen, and the only thing printed.
+        '#print-root': { display: 'none' },
+        '@media print': {
+          'body > :not(#print-root)': { display: 'none !important' },
+          '#print-root': { display: 'block' },
+          body: { minWidth: 0, backgroundColor: '#ffffff' },
+        },
       },
     },
     MuiButton: {

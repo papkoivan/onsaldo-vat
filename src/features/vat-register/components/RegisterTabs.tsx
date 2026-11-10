@@ -5,6 +5,7 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import type { RegisterType } from '@/domain/vat'
 import { useViewportDown } from '../hooks/useViewportDown'
+import { REGISTER_LABELS } from '../utils/registers'
 
 interface RegisterTabsProps {
   value: RegisterType
@@ -20,12 +21,12 @@ interface RegisterTabConfig {
 const registerTabs: readonly RegisterTabConfig[] = [
   {
     value: 'sales',
-    label: 'Rejestr VAT sprzedaży',
+    label: REGISTER_LABELS.sales,
     icon: <ReceiptLongOutlined />,
   },
   {
     value: 'purchases',
-    label: 'Rejestr VAT zakupów',
+    label: REGISTER_LABELS.purchases,
     icon: <ShoppingCartOutlined />,
   },
 ]

@@ -6,6 +6,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import type { VatDocument } from '@/domain/vat'
+import type { DocumentTagAssignments, DocumentTagId } from '../../types/tags'
 import { colors } from '@/theme/tokens'
 import { DocumentsEmptyState } from '../DocumentsEmptyState'
 import {
@@ -26,9 +27,13 @@ interface DocumentsTableProps {
   someSelected: boolean
   onToggleSelect: (id: string) => void
   onToggleSelectAll: () => void
+  tagAssignments: DocumentTagAssignments
+  onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
   /** Undefined when there is nothing to reset. */
   onResetFilters?: () => void
 }
+
+const NO_TAGS: readonly DocumentTagId[] = []
 
 const headCellSx = {
   py: 1,
@@ -48,6 +53,8 @@ export function DocumentsTable({
   someSelected,
   onToggleSelect,
   onToggleSelectAll,
+  tagAssignments,
+  onRemoveTag,
   onResetFilters,
 }: DocumentsTableProps) {
   return (
@@ -129,6 +136,8 @@ export function DocumentsTable({
                 selected={selectedIds.has(document.id)}
                 onToggleExpand={onToggleExpand}
                 onToggleSelect={onToggleSelect}
+                tags={tagAssignments[document.id] ?? NO_TAGS}
+                onRemoveTag={onRemoveTag}
               />
             ))
           )}

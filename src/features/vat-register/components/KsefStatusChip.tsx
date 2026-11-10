@@ -5,6 +5,7 @@ import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined'
 import Chip from '@mui/material/Chip'
 import type { KsefStatus } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
+import { KSEF_STATUS_LABELS } from '../utils/ksefStatus'
 
 interface KsefStatusChipProps {
   status: KsefStatus
@@ -20,21 +21,21 @@ interface StatusAppearance {
 
 const appearance: Record<KsefStatus, StatusAppearance> = {
   confirmed: {
-    label: 'Potwierdzony',
+    label: KSEF_STATUS_LABELS.confirmed,
     icon: <CheckCircleOutlineOutlined />,
     color: colors.successText,
     background: colors.successBg,
     border: colors.successBorder,
   },
   pending: {
-    label: 'Brak potwierdzenia',
+    label: KSEF_STATUS_LABELS.pending,
     icon: <ScheduleOutlined />,
     color: colors.warningText,
     background: colors.warningBg,
     border: colors.warningBorder,
   },
   rejected: {
-    label: 'Odrzucony',
+    label: KSEF_STATUS_LABELS.rejected,
     icon: <ErrorOutlineOutlined />,
     color: colors.errorText,
     background: colors.errorBg,

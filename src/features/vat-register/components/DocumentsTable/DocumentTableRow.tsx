@@ -10,7 +10,9 @@ import Tooltip from '@mui/material/Tooltip'
 import type { VatDocument } from '@/domain/vat'
 import { colors } from '@/theme/tokens'
 import { formatCurrency, formatDate } from '@/utils/format'
+import type { DocumentTagId } from '../../types/tags'
 import { DocumentDetails } from '../DocumentDetails'
+import { DocumentTagChips } from '../DocumentTagChips'
 import { KsefStatusChip } from '../KsefStatusChip'
 import {
   TABLE_COLUMN_COUNT,
@@ -27,6 +29,8 @@ interface DocumentTableRowProps {
   selected: boolean
   onToggleExpand: (id: string) => void
   onToggleSelect: (id: string) => void
+  tags: readonly DocumentTagId[]
+  onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
 }
 
 export function DocumentTableRow({
@@ -35,6 +39,8 @@ export function DocumentTableRow({
   selected,
   onToggleExpand,
   onToggleSelect,
+  tags,
+  onRemoveTag,
 }: DocumentTableRowProps) {
   const detailsId = `document-details-${document.id}`
   const expandLabel = `${expanded ? 'Zwiń' : 'Rozwiń'} szczegóły dokumentu ${document.documentNumber}`
@@ -69,6 +75,11 @@ export function DocumentTableRow({
           <Box sx={truncatedTextSx} title={document.contractor}>
             {document.contractor}
           </Box>
+          {tags.length > 0 && (
+            <Box sx={{ mt: 0.5, fontWeight: 400 }}>
+              <DocumentTagChips tagIds={tags} />
+            </Box>
+          )}
         </TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           {formatDate(document.issueDate)}
@@ -127,7 +138,12 @@ export function DocumentTableRow({
           sx={{ p: 0, borderBottom: expanded ? undefined : 'none' }}
         >
           <Collapse in={expanded} timeout="auto">
-            <DocumentDetails document={document} id={detailsId} />
+            <DocumentDetails
+              document={document}
+              id={detailsId}
+              tags={tags}
+              onRemoveTag={(tagId) => onRemoveTag(document, tagId)}
+            />
           </Collapse>
         </TableCell>
       </TableRow>

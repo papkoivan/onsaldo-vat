@@ -40,6 +40,8 @@ export function useDocumentSelection(visibleIds: readonly string[]) {
 
   const toggleAll = allSelected ? deselectAll : selectAll
 
+  const clear = useCallback(() => setSelectedIds(new Set()), [])
+
   return {
     selectedIds,
     allSelected,
@@ -47,6 +49,7 @@ export function useDocumentSelection(visibleIds: readonly string[]) {
     toggle,
     selectAll,
     toggleAll,
+    clear,
   }
 }
 

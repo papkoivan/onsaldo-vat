@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box'
 import type { VatDocument } from '@/domain/vat'
+import type { DocumentTagAssignments, DocumentTagId } from '../../types/tags'
 import { colors } from '@/theme/tokens'
 import { DocumentsEmptyState } from '../DocumentsEmptyState'
 import { DocumentCard } from './DocumentCard'
@@ -10,9 +11,13 @@ interface DocumentsListProps {
   onToggleExpand: (id: string) => void
   selectedIds: ReadonlySet<string>
   onToggleSelect: (id: string) => void
+  tagAssignments: DocumentTagAssignments
+  onRemoveTag: (document: VatDocument, tagId: DocumentTagId) => void
   /** Undefined when there is nothing to reset. */
   onResetFilters?: () => void
 }
+
+const NO_TAGS: readonly DocumentTagId[] = []
 
 export function DocumentsList({
   documents,
@@ -20,6 +25,8 @@ export function DocumentsList({
   onToggleExpand,
   selectedIds,
   onToggleSelect,
+  tagAssignments,
+  onRemoveTag,
   onResetFilters,
 }: DocumentsListProps) {
   if (documents.length === 0) {
@@ -56,6 +63,8 @@ export function DocumentsList({
           selected={selectedIds.has(document.id)}
           onToggleExpand={onToggleExpand}
           onToggleSelect={onToggleSelect}
+          tags={tagAssignments[document.id] ?? NO_TAGS}
+          onRemoveTag={onRemoveTag}
         />
       ))}
     </Box>
