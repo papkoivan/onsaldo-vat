@@ -6,10 +6,7 @@ import { formatDocumentCount } from '@/utils/format'
 import type { FilterKey, FilterOption } from '../types/filters'
 import { DEFAULT_SORT } from '../types/sort'
 import type { SortKey } from '../types/sort'
-import { useBulkTagging } from '../hooks/useBulkTagging'
-import { useDocumentSelection } from '../hooks/useDocumentSelection'
 import type { DocumentSearchState } from '../hooks/useDocumentSearch'
-import { useDocumentTags } from '../hooks/useDocumentTags'
 import { useExpandedDocuments } from '../hooks/useExpandedDocuments'
 import { useFeedback } from '../hooks/useFeedback'
 import { usePagination } from '../hooks/usePagination'
@@ -24,8 +21,6 @@ import {
 import { nextSort, sortDocuments } from '../utils/sortDocuments'
 import type { VatViewState } from '../types/viewState'
 import { ActiveFilters } from './ActiveFilters'
-import { BulkActionConfirmDialog } from './BulkActionConfirmDialog'
-import { BulkActionsBar } from './BulkActionsBar'
 import { DocumentsList } from './DocumentsList/DocumentsList'
 import { DocumentsPagination } from './DocumentsPagination'
 import { DocumentsTable } from './DocumentsTable/DocumentsTable'
@@ -38,7 +33,6 @@ import { DocumentToolbar } from './DocumentToolbar'
 import { FeedbackSnackbar } from './FeedbackSnackbar'
 import { FiltersDrawer } from './FiltersDrawer'
 import { PrintView } from './PrintView'
-import { TagActionsMenu } from './TagActionsMenu'
 
 interface DocumentSectionProps {
   register: RegisterType
@@ -49,8 +43,6 @@ interface DocumentSectionProps {
   search: DocumentSearchState
   filters: VatFiltersState
   viewState: VatViewState
-  /** Changes when the underlying dataset changes; visible selection is dropped then. */
-  dataScope: string
   onRetry: () => void
 }
 
@@ -71,7 +63,6 @@ export function DocumentSection({
   search,
   filters,
   viewState,
-  dataScope,
   onRetry,
 }: DocumentSectionProps) {
   const isMobile = useViewportDown('md')
@@ -86,32 +77,13 @@ export function DocumentSection({
   )
   const pagination = usePagination(documents)
   const { pageItems } = pagination
-  const visibleIds = useMemo(
-    () => pageItems.map((document) => document.id),
-    [pageItems],
-  )
   const expanded = useExpandedDocuments()
-  const selection = useDocumentSelection(visibleIds, `${register}:${dataScope}`)
-  const tags = useDocumentTags()
   const feedback = useFeedback()
   const { printedAt, print } = usePrintView()
-
-  // Selection spans pages; documents hidden by the current search/filters are not acted on.
-  const selectedDocuments = useMemo(
-    () =>
-      documents.filter((document) => selection.selectedIds.has(document.id)),
-    [documents, selection.selectedIds],
-  )
-  const bulkTagging = useBulkTagging({
-    selectedDocuments,
-    tags,
-    notify: feedback.notify,
-  })
 
   const canResetAll =
     filters.activeFilters.length > 0 || search.inputValue !== ''
   const hasDocuments = documents.length > 0
-  const hasSelection = selectedDocuments.length > 0
 
   const isFilled = viewState === 'filled'
   // nothing to search or filter while the register is empty, loading or failed
@@ -162,44 +134,26 @@ export function DocumentSection({
             documents={pageItems}
             expandedIds={expanded.expandedIds}
             onToggleExpand={expanded.toggle}
-            selectedIds={selection.selectedIds}
-            onToggleSelect={selection.toggle}
-            tagAssignments={tags.assignments}
-            onRemoveTag={bulkTagging.removeFromDocument}
           />
         ) : (
           <DocumentsTable
             documents={pageItems}
             expandedIds={expanded.expandedIds}
             onToggleExpand={expanded.toggle}
-            selectedIds={selection.selectedIds}
-            allSelected={selection.allSelected}
-            someSelected={selection.someSelected}
-            onToggleSelect={selection.toggle}
-            onToggleSelectAll={selection.toggleAll}
             sort={sort}
             onSortChange={handleSortChange}
-            tagAssignments={tags.assignments}
-            onRemoveTag={bulkTagging.removeFromDocument}
           />
         )
     }
   }
 
-  const exportDocuments = (
-    toExport: readonly VatDocument[],
-    scope?: string,
-  ) => {
-    const filename = buildExportFilename(register, new Date(), scope)
+  const exportDocuments = () => {
+    const filename = buildExportFilename(register, new Date())
     try {
-      downloadTextFile(
-        filename,
-        buildDocumentsCsv(toExport, tags.assignments),
-        CSV_MIME_TYPE,
-      )
+      downloadTextFile(filename, buildDocumentsCsv(documents), CSV_MIME_TYPE)
       feedback.notify({
         severity: 'success',
-        message: `Wyeksportowano ${formatDocumentCount(toExport.length)} do pliku ${filename}.`,
+        message: `Wyeksportowano ${formatDocumentCount(documents.length)} do pliku ${filename}.`,
       })
     } catch {
       feedback.notify({
@@ -236,22 +190,9 @@ export function DocumentSection({
         activeFilterCount={toolbarDisabled ? 0 : filters.activeFilters.length}
         onOpenFilters={filters.openDrawer}
         onPrint={hasDocuments ? print : undefined}
-        onExport={hasDocuments ? () => exportDocuments(documents) : undefined}
-        onExportSelected={
-          hasSelection
-            ? () => exportDocuments(selectedDocuments, 'zaznaczone')
-            : undefined
-        }
-        onTag={hasSelection ? bulkTagging.openMenu : undefined}
-        onClearSelection={hasSelection ? selection.clear : undefined}
-        onSelectAll={pageItems.length > 0 ? selection.selectAll : undefined}
+        onExport={hasDocuments ? exportDocuments : undefined}
         canResetAll={canResetAll}
         onResetAll={handleResetAll}
-      />
-      <BulkActionsBar
-        selectedCount={selectedDocuments.length}
-        onOpenTagMenu={bulkTagging.openMenu}
-        onClearSelection={selection.clear}
       />
       <ActiveFilters
         filters={
@@ -273,29 +214,12 @@ export function DocumentSection({
         onReset={filters.resetDraft}
         onApply={filters.applyDraft}
       />
-      <TagActionsMenu
-        anchorEl={bulkTagging.menuAnchor}
-        onClose={bulkTagging.closeMenu}
-        onExited={bulkTagging.handleMenuExited}
-        selectedIds={bulkTagging.selectedIds}
-        assignments={tags.assignments}
-        onAdd={(tagId) => bulkTagging.request({ type: 'add', tagId })}
-        onRemove={(tagId) => bulkTagging.request({ type: 'remove', tagId })}
-      />
-      <BulkActionConfirmDialog
-        open={bulkTagging.pending?.open ?? false}
-        action={bulkTagging.pending?.action ?? null}
-        documentCount={bulkTagging.pending?.documentIds.length ?? 0}
-        onConfirm={bulkTagging.confirm}
-        onCancel={bulkTagging.cancel}
-      />
       <FeedbackSnackbar feedback={feedback.feedback} onClose={feedback.close} />
       {printedAt && isFilled && (
         <PrintView
           companyName={companyName}
           register={register}
           documents={documents}
-          tags={tags.assignments}
           searchQuery={search.query}
           filters={filters.activeFilters}
           printedAt={printedAt}

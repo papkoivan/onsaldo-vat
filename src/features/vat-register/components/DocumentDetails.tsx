@@ -14,8 +14,6 @@ import {
   formatNip,
   formatVatRate,
 } from '@/utils/format'
-import type { DocumentTagId } from '../types/tags'
-import { DocumentTagChips } from './DocumentTagChips'
 import { KsefStatusChip } from './KsefStatusChip'
 import { numericCellSx } from './tableStyles'
 
@@ -26,8 +24,6 @@ interface DocumentDetailsProps {
   id: string
   /** `table`: bordered panels under a table row. `card`: flat stacked sections inside a mobile card. */
   variant?: DocumentDetailsVariant
-  tags?: readonly DocumentTagId[]
-  onRemoveTag?: (tagId: DocumentTagId) => void
 }
 
 interface SectionTitles {
@@ -168,8 +164,6 @@ export function DocumentDetails({
   document,
   id,
   variant = 'table',
-  tags = [],
-  onRemoveTag,
 }: DocumentDetailsProps) {
   const titles = sectionTitles[variant]
 
@@ -281,13 +275,6 @@ export function DocumentDetails({
             <KsefStatusChip status={document.ksefStatus} />
           </DetailRow>
           <DetailRow label="Identyfikator">{document.identifier}</DetailRow>
-          <DetailRow label="Oznaczenia (lokalne)">
-            {tags.length > 0 ? (
-              <DocumentTagChips tagIds={tags} onRemove={onRemoveTag} />
-            ) : (
-              EMPTY_VALUE
-            )}
-          </DetailRow>
         </DetailList>
       </DetailSection>
     </Box>

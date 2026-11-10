@@ -12,16 +12,13 @@ import {
 } from '@/utils/format'
 import { calculateDocumentTotals } from '@/utils/vatCalculations'
 import type { ActiveFilter } from '../types/filters'
-import type { DocumentTagAssignments, DocumentTagId } from '../types/tags'
 import { KSEF_STATUS_LABELS } from '../utils/ksefStatus'
 import { REGISTER_LABELS } from '../utils/registers'
-import { getTag } from '../utils/tags'
 
 interface PrintViewProps {
   companyName: string
   register: RegisterType
   documents: readonly VatDocument[]
-  tags: DocumentTagAssignments
   searchQuery: string
   filters: readonly ActiveFilter[]
   printedAt: Date
@@ -73,15 +70,6 @@ const printSx = {
   '& tr': { breakInside: 'avoid', pageBreakInside: 'avoid' },
   '& .nowrap': { whiteSpace: 'nowrap', overflowWrap: 'normal' },
   '& .muted': { color: '#444' },
-  '& .tag': {
-    display: 'inline-block',
-    mr: '3px',
-    mt: '2px',
-    px: '4px',
-    border: '0.5pt solid #000',
-    borderRadius: '3px',
-    fontWeight: 700,
-  },
 } as const
 
 function Cell({ label, children }: { label?: string; children: string }) {
@@ -96,11 +84,9 @@ function Cell({ label, children }: { label?: string; children: string }) {
 function PrintRow({
   document,
   index,
-  tagIds,
 }: {
   document: VatDocument
   index: number
-  tagIds: readonly DocumentTagId[]
 }) {
   return (
     <tr>
@@ -108,15 +94,6 @@ function PrintRow({
       <td>
         <strong>{document.contractor}</strong>
         <Cell label="NIP">{formatNip(document.nip)}</Cell>
-        {tagIds.length > 0 && (
-          <div>
-            {tagIds.map((id) => (
-              <span key={id} className="tag">
-                {getTag(id).label}
-              </span>
-            ))}
-          </div>
-        )}
       </td>
       <td className="nowrap">
         <Cell label="Wyst.">{formatDate(document.issueDate)}</Cell>
@@ -156,7 +133,6 @@ export function PrintView({
   companyName,
   register,
   documents,
-  tags,
   searchQuery,
   filters,
   printedAt,
@@ -211,12 +187,7 @@ export function PrintView({
         </thead>
         <tbody>
           {documents.map((document, index) => (
-            <PrintRow
-              key={document.id}
-              document={document}
-              index={index}
-              tagIds={tags[document.id] ?? []}
-            />
+            <PrintRow key={document.id} document={document} index={index} />
           ))}
         </tbody>
         <tfoot>
@@ -229,8 +200,7 @@ export function PrintView({
         </tfoot>
       </table>
       <Box className="muted" sx={{ mt: '8px', fontSize: '7.5pt' }}>
-        Dane demonstracyjne (prototyp). Oznaczenia są lokalne i nie są
-        zapisywane w systemie księgowym.
+        Dane demonstracyjne (prototyp).
       </Box>
     </Box>,
     root,

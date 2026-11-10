@@ -5,10 +5,6 @@ const collator = new Intl.Collator('pl', { numeric: true, sensitivity: 'base' })
 
 function compareValues(key: SortKey, a: VatDocument, b: VatDocument): number {
   switch (key) {
-    case 'netAmount':
-    case 'vatAmount':
-    case 'grossAmount':
-      return a[key] - b[key]
     case 'issueDate':
       // ISO dates sort correctly as plain strings
       return a.issueDate.localeCompare(b.issueDate)

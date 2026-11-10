@@ -106,7 +106,6 @@ export function VatRegisterPage() {
           search={search}
           filters={filters}
           viewState={viewState}
-          dataScope={dataState}
           onRetry={() => setDataState('filled')}
         />
       </Stack>

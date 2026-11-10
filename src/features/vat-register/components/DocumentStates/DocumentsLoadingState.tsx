@@ -11,11 +11,7 @@ import { DEFAULT_PAGE_SIZE } from '../../hooks/usePagination'
 import { DEFAULT_SORT } from '../../types/sort'
 import { DocumentsTableHead } from '../DocumentsTable/DocumentsTableHead'
 import { tableContainerSx, tableSx } from '../DocumentsTable/tableLayout'
-import {
-  desktopOnlyCellSx,
-  laptopUpCellSx,
-  numericCellSx,
-} from '../tableStyles'
+import { desktopOnlyCellSx } from '../tableStyles'
 
 interface DocumentsLoadingStateProps {
   layout: 'table' | 'cards'
@@ -32,25 +28,10 @@ function TableSkeleton() {
   return (
     <TableContainer sx={tableContainerSx}>
       <Table size="small" sx={tableSx}>
-        <DocumentsTableHead
-          allSelected={false}
-          someSelected={false}
-          disabled
-          sort={DEFAULT_SORT}
-          onSortChange={noop}
-          onToggleSelectAll={noop}
-        />
+        <DocumentsTableHead disabled sort={DEFAULT_SORT} onSortChange={noop} />
         <TableBody>
           {ROWS.map((row) => (
             <TableRow key={row} sx={{ height: 52 }}>
-              <TableCell padding="checkbox">
-                <Skeleton
-                  variant="rounded"
-                  width={18}
-                  height={18}
-                  sx={{ m: '13px' }}
-                />
-              </TableCell>
               <TableCell>
                 <TextSkeleton width={120} />
               </TableCell>
@@ -65,15 +46,6 @@ function TableSkeleton() {
               </TableCell>
               <TableCell sx={desktopOnlyCellSx}>
                 <TextSkeleton width={96} />
-              </TableCell>
-              <TableCell sx={{ ...numericCellSx, ...laptopUpCellSx }}>
-                <Skeleton variant="text" width={84} sx={{ ml: 'auto' }} />
-              </TableCell>
-              <TableCell sx={{ ...numericCellSx, ...laptopUpCellSx }}>
-                <Skeleton variant="text" width={70} sx={{ ml: 'auto' }} />
-              </TableCell>
-              <TableCell sx={numericCellSx}>
-                <Skeleton variant="text" width={88} sx={{ ml: 'auto' }} />
               </TableCell>
               <TableCell padding="checkbox">
                 <Skeleton
@@ -99,7 +71,7 @@ function CardsSkeleton() {
           key={row}
           sx={{
             display: 'grid',
-            gridTemplateColumns: '44px minmax(0, 1fr) 44px',
+            gridTemplateColumns: 'minmax(0, 1fr) 44px',
             alignItems: 'start',
             columnGap: 0.5,
             rowGap: 0.5,
@@ -109,12 +81,6 @@ function CardsSkeleton() {
             backgroundColor: 'background.paper',
           }}
         >
-          <Skeleton
-            variant="rounded"
-            width={20}
-            height={20}
-            sx={{ m: '12px' }}
-          />
           <Box sx={{ pt: 0.75, minWidth: 0 }}>
             <Skeleton variant="text" width="60%" sx={{ fontSize: '1rem' }} />
             <TextSkeleton width={140} />
@@ -131,7 +97,6 @@ function CardsSkeleton() {
               gridColumn: '1 / -1',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
               px: 1,
               pb: 0.75,
             }}
@@ -142,7 +107,6 @@ function CardsSkeleton() {
               height={24}
               sx={{ borderRadius: '12px' }}
             />
-            <Skeleton variant="text" width={96} sx={{ fontSize: '1rem' }} />
           </Box>
         </Box>
       ))}

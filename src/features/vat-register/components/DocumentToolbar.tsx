@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import type { MouseEvent, ReactElement } from 'react'
-import CheckBoxOutlined from '@mui/icons-material/CheckBoxOutlined'
-import ClearOutlined from '@mui/icons-material/ClearOutlined'
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
-import LocalOfferOutlined from '@mui/icons-material/LocalOfferOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined'
@@ -34,14 +31,6 @@ interface DocumentToolbarProps {
   onPrint?: () => void
   /** Undefined when there are no documents to export — the action stays disabled. */
   onExport?: () => void
-  /** Undefined while nothing is selected. */
-  onExportSelected?: () => void
-  /** Undefined while nothing is selected. Receives the element to anchor the tag menu to. */
-  onTag?: (anchor: HTMLElement) => void
-  /** Undefined while nothing is selected. */
-  onClearSelection?: () => void
-  /** Undefined when there are no documents to select. */
-  onSelectAll?: () => void
   canResetAll: boolean
   onResetAll: () => void
 }
@@ -103,10 +92,6 @@ export function DocumentToolbar({
   onOpenFilters,
   onPrint,
   onExport,
-  onExportSelected,
-  onTag,
-  onClearSelection,
-  onSelectAll,
   canResetAll,
   onResetAll,
 }: DocumentToolbarProps) {
@@ -117,13 +102,6 @@ export function DocumentToolbar({
   const handleMenuAction = (action?: () => void) => () => {
     closeMenu()
     action?.()
-  }
-
-  // On phones the tag menu opens from the "more" button, which stays in the layout.
-  const handleMenuTag = () => {
-    const anchor = menuAnchor
-    closeMenu()
-    if (anchor) onTag?.(anchor)
   }
 
   return (
@@ -179,12 +157,6 @@ export function DocumentToolbar({
         {!compact && (
           <>
             <ToolbarIconButton
-              label="Oznacz dokumenty"
-              icon={<LocalOfferOutlined />}
-              onClick={onTag && ((event) => onTag(event.currentTarget))}
-              disabledHint={unavailableReason ?? 'najpierw zaznacz dokumenty'}
-            />
-            <ToolbarIconButton
               label="Drukuj"
               icon={<PrintOutlined />}
               onClick={onPrint}
@@ -221,17 +193,6 @@ export function DocumentToolbar({
         >
           {compact && [
             <MenuItem
-              key="tag"
-              disabled={!onTag}
-              onClick={handleMenuTag}
-              sx={menuItemSx}
-            >
-              <ListItemIcon>
-                <LocalOfferOutlined fontSize="small" />
-              </ListItemIcon>
-              Oznacz zaznaczone dokumenty
-            </MenuItem>,
-            <MenuItem
               key="print"
               disabled={!onPrint}
               onClick={handleMenuAction(onPrint)}
@@ -255,37 +216,6 @@ export function DocumentToolbar({
             </MenuItem>,
             <Divider key="divider" />,
           ]}
-          <MenuItem
-            disabled={!onExportSelected}
-            onClick={handleMenuAction(onExportSelected)}
-            sx={menuItemSx}
-          >
-            <ListItemIcon>
-              <FileDownloadOutlined fontSize="small" />
-            </ListItemIcon>
-            Eksportuj zaznaczone (CSV)
-          </MenuItem>
-          <MenuItem
-            disabled={!onSelectAll}
-            onClick={handleMenuAction(onSelectAll)}
-            sx={menuItemSx}
-          >
-            <ListItemIcon>
-              <CheckBoxOutlined fontSize="small" />
-            </ListItemIcon>
-            Zaznacz wszystkie widoczne
-          </MenuItem>
-          <MenuItem
-            disabled={!onClearSelection}
-            onClick={handleMenuAction(onClearSelection)}
-            sx={menuItemSx}
-          >
-            <ListItemIcon>
-              <ClearOutlined fontSize="small" />
-            </ListItemIcon>
-            Wyczyść zaznaczenie
-          </MenuItem>
-          <Divider />
           <MenuItem
             disabled={!canResetAll}
             onClick={handleMenuAction(onResetAll)}

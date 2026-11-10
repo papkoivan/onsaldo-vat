@@ -1,4 +1,4 @@
-export const TABLE_COLUMN_COUNT = 10
+export const TABLE_COLUMN_COUNT = 6
 
 export const numericCellSx = {
   textAlign: 'right',
@@ -6,12 +6,8 @@ export const numericCellSx = {
   whiteSpace: 'nowrap',
 } as const
 
-// Below these breakpoints the hidden columns' data is still available in the
+// Below this breakpoint the hidden columns' data is still available in the
 // expanded row (and on mobile the table is replaced by cards).
-export const laptopUpCellSx = {
-  display: { xs: 'none', lg: 'table-cell' },
-} as const
-
 export const desktopOnlyCellSx = {
   display: { xs: 'none', xl: 'table-cell' },
 } as const

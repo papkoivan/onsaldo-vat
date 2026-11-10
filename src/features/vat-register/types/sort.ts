@@ -2,14 +2,7 @@ import type { VatDocument } from '@/domain/vat'
 
 export type SortKey = keyof Pick<
   VatDocument,
-  | 'contractor'
-  | 'issueDate'
-  | 'documentNumber'
-  | 'ksefNumber'
-  | 'identifier'
-  | 'netAmount'
-  | 'vatAmount'
-  | 'grossAmount'
+  'contractor' | 'issueDate' | 'documentNumber' | 'ksefNumber' | 'identifier'
 >
 
 export type SortDirection = 'asc' | 'desc'

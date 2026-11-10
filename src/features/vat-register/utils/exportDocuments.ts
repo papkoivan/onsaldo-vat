@@ -8,10 +8,8 @@ import {
   toLocalIsoDate,
 } from '@/utils/format'
 import { aggregateVatBreakdown } from '@/utils/vatCalculations'
-import type { DocumentTagAssignments } from '../types/tags'
 import { KSEF_STATUS_LABELS } from './ksefStatus'
 import { REGISTER_FILE_SLUGS } from './registers'
-import { getTag } from './tags'
 
 export const CSV_MIME_TYPE = 'text/csv;charset=utf-8'
 
@@ -30,7 +28,6 @@ const BASE_HEADERS = [
   'Kwota netto',
   'Kwota VAT',
   'Kwota brutto',
-  'Oznaczenia (lokalne)',
 ] as const
 
 const amountOfRate = (
@@ -43,10 +40,7 @@ const amountOfRate = (
     .reduce((sum, item) => sum + item[pick], 0)
 
 /** One row per document in the given order, with the per-rate VAT breakdown in trailing columns. */
-export function buildDocumentsCsv(
-  documents: readonly VatDocument[],
-  tags: DocumentTagAssignments,
-): string {
+export function buildDocumentsCsv(documents: readonly VatDocument[]): string {
   const rates = aggregateVatBreakdown(documents).map((item) => item.rate)
 
   const header = [
@@ -72,7 +66,6 @@ export function buildDocumentsCsv(
     formatAmountPlain(document.netAmount),
     formatAmountPlain(document.vatAmount),
     formatAmountPlain(document.grossAmount),
-    (tags[document.id] ?? []).map((id) => getTag(id).label).join(', '),
     ...rates.flatMap((rate) => [
       formatAmountPlain(amountOfRate(document, rate, 'netAmount')),
       formatAmountPlain(amountOfRate(document, rate, 'vatAmount')),
@@ -85,8 +78,6 @@ export function buildDocumentsCsv(
 export function buildExportFilename(
   register: RegisterType,
   date: Date,
-  scope?: string,
 ): string {
-  const parts = [REGISTER_FILE_SLUGS[register], scope, toLocalIsoDate(date)]
-  return `${parts.filter(Boolean).join('-')}.csv`
+  return `${REGISTER_FILE_SLUGS[register]}-${toLocalIsoDate(date)}.csv`
 }

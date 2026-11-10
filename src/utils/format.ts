@@ -77,7 +77,3 @@ export const toLocalIsoDate = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${date.getFullYear()}-${month}-${day}`
 }
-
-/** "1 dokumentu", "3 dokumentów" — genitive, for phrases like "do 3 dokumentów". */
-export const formatDocumentCountGenitive = (count: number): string =>
-  count === 1 ? '1 dokumentu' : `${count} dokumentów`

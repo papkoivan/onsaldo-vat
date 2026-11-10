@@ -32,8 +32,8 @@ function expectedTotals(register: RegisterType, month = '2026-10') {
   }
 }
 
-const documentCheckboxes = () =>
-  screen.queryAllByRole('checkbox', { name: /^Zaznacz dokument / })
+const documentRows = () =>
+  screen.queryAllByRole('button', { name: /szczegóły dokumentu / })
 
 const summaryText = () =>
   normalize(
@@ -75,7 +75,7 @@ describe('registers and financial summary', () => {
       'aria-selected',
       'true',
     )
-    expect(documentCheckboxes()).toHaveLength(10)
+    expect(documentRows()).toHaveLength(10)
     expect(screen.getByText(`1–10 z ${totals.count}`)).toBeInTheDocument()
     expectSummary(totals)
   })
@@ -102,9 +102,7 @@ describe('registers and financial summary', () => {
       screen.getByRole('button', { name: 'Przejdź do strony 2' }),
     )
 
-    expect(documentCheckboxes()).toHaveLength(
-      expectedTotals('sales').count - 10,
-    )
+    expect(documentRows()).toHaveLength(expectedTotals('sales').count - 10)
     expect(summaryText()).toBe(before)
   })
 })
@@ -126,10 +124,7 @@ describe('search', () => {
       target.documentNumber,
     )
 
-    await waitFor(
-      () => expect(documentCheckboxes()).toHaveLength(1),
-      SEARCH_TIMEOUT,
-    )
+    await waitFor(() => expect(documentRows()).toHaveLength(1), SEARCH_TIMEOUT)
     expect(screen.getByText('1 dokument')).toBeInTheDocument()
     expectSummary({
       net: target.netAmount,
@@ -158,18 +153,50 @@ describe('search', () => {
         name: 'Wyczyść wyszukiwanie',
       }),
     )
-    await waitFor(
-      () => expect(documentCheckboxes()).toHaveLength(10),
-      SEARCH_TIMEOUT,
-    )
+    await waitFor(() => expect(documentRows()).toHaveLength(10), SEARCH_TIMEOUT)
+  })
+})
+
+describe('documents table', () => {
+  it('shows only identification columns, with amounts moved to the expanded row', async () => {
+    const user = setup()
+    const headers = screen
+      .getAllByRole('columnheader')
+      .map((header) =>
+        header.textContent?.replace(/, posortowano.*$/, '').trim(),
+      )
+      .filter(Boolean)
+
+    expect(headers).toEqual([
+      'Kontrahent',
+      'Data',
+      'Numer dokumentu',
+      'Numer KSeF',
+      'Identyfikator',
+      'Szczegóły',
+    ])
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+
+    const [expand] = screen.getAllByRole('button', {
+      name: /^Rozwiń szczegóły dokumentu /,
+    })
+    if (!expand) throw new Error('expected an expandable row')
+    await user.click(expand)
+
+    const details = screen.getByRole('region', {
+      name: /^Szczegóły dokumentu /,
+    })
+    for (const label of ['Netto', 'VAT', 'Brutto']) {
+      expect(within(details).getAllByText(label).length).toBeGreaterThan(0)
+    }
   })
 })
 
 describe('sorting', () => {
-  it('sorts by gross amount in both directions without changing the totals', async () => {
+  it('sorts by document number in both directions without changing the totals', async () => {
     const user = setup()
     const before = summaryText()
-    const header = screen.getByRole('columnheader', { name: /Kwota brutto/ })
+    const header = screen.getByRole('columnheader', { name: /Numer dokumentu/ })
 
     await user.click(within(header).getByRole('button'))
     expect(header).toHaveAttribute('aria-sort', 'ascending')
@@ -286,7 +313,7 @@ describe('pagination', () => {
     await user.click(screen.getByRole('combobox', { name: 'Na stronie' }))
     await user.click(await screen.findByRole('option', { name: '20' }))
 
-    expect(documentCheckboxes()).toHaveLength(Math.min(20, count))
+    expect(documentRows()).toHaveLength(Math.min(20, count))
     expect(
       screen.getByText(`1–${Math.min(20, count)} z ${count}`),
     ).toBeInTheDocument()
@@ -321,82 +348,6 @@ describe('expanding documents', () => {
     expect(
       screen.getAllByRole('button', { name: /^Zwiń szczegóły dokumentu / }),
     ).toHaveLength(2)
-  })
-})
-
-describe('selection and tags', () => {
-  it('keeps the selection across pages and counts it', async () => {
-    const user = setup()
-
-    await user.click(
-      screen.getByRole('checkbox', {
-        name: 'Zaznacz wszystkie widoczne dokumenty',
-      }),
-    )
-    expect(screen.getByText('Zaznaczono: 10 dokumentów')).toBeInTheDocument()
-
-    await user.click(
-      screen.getByRole('button', { name: 'Przejdź do strony 2' }),
-    )
-    const [pageTwoFirst] = documentCheckboxes()
-    if (!pageTwoFirst) throw new Error('expected a document on page 2')
-    await user.click(pageTwoFirst)
-    expect(screen.getByText('Zaznaczono: 11 dokumentów')).toBeInTheDocument()
-
-    await user.click(
-      screen.getByRole('button', { name: 'Przejdź do strony 1' }),
-    )
-    expect(
-      documentCheckboxes().every(
-        (checkbox) => (checkbox as HTMLInputElement).checked,
-      ),
-    ).toBe(true)
-  })
-
-  it('tags selected documents across pages and removes the tag again', async () => {
-    const user = setup()
-
-    await user.click(
-      screen.getByRole('checkbox', {
-        name: 'Zaznacz wszystkie widoczne dokumenty',
-      }),
-    )
-    await user.click(
-      screen.getByRole('button', { name: 'Przejdź do strony 2' }),
-    )
-    const [pageTwoFirst] = documentCheckboxes()
-    if (!pageTwoFirst) throw new Error('expected a document on page 2')
-    await user.click(pageTwoFirst)
-
-    await user.click(screen.getByRole('button', { name: 'Oznaczenia' }))
-    await user.click(
-      await screen.findByRole('menuitem', { name: 'Dodaj oznaczenie: Pilne' }),
-    )
-    await user.click(
-      await screen.findByRole('button', { name: 'Dodaj oznaczenie' }),
-    )
-
-    expect(
-      await screen.findByText(/Dodano oznaczenie „Pilne” do 11 dokumentów/),
-    ).toBeInTheDocument()
-    expect(screen.getAllByText('Pilne').length).toBeGreaterThan(0)
-    await waitFor(() =>
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
-    )
-
-    await user.click(screen.getByRole('button', { name: 'Oznaczenia' }))
-    await user.click(
-      await screen.findByRole('menuitem', {
-        name: 'Usuń oznaczenie: Pilne (11)',
-      }),
-    )
-    await user.click(
-      await screen.findByRole('button', { name: 'Usuń oznaczenie' }),
-    )
-
-    expect(
-      await screen.findByText(/Usunięto oznaczenie „Pilne” z 11 dokumentów/),
-    ).toBeInTheDocument()
   })
 })
 
@@ -470,7 +421,7 @@ describe('demo states', () => {
     ).toBeDisabled()
 
     await choose(user, 'Wypełniony')
-    expect(documentCheckboxes()).toHaveLength(10)
+    expect(documentRows()).toHaveLength(10)
   })
 
   it('shows an error with a retry that restores the data', async () => {
@@ -480,10 +431,10 @@ describe('demo states', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Nie udało się załadować dokumentów',
     )
-    expect(documentCheckboxes()).toHaveLength(0)
+    expect(documentRows()).toHaveLength(0)
 
     await user.click(screen.getByRole('button', { name: 'Spróbuj ponownie' }))
-    expect(documentCheckboxes()).toHaveLength(10)
+    expect(documentRows()).toHaveLength(10)
     expectSummary(expectedTotals('sales'))
   })
 
@@ -491,11 +442,11 @@ describe('demo states', () => {
     const user = setup()
     await choose(user, 'Ładowanie')
 
-    expect(documentCheckboxes()).toHaveLength(0)
+    expect(documentRows()).toHaveLength(0)
     expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
 
     await choose(user, 'Wypełniony')
-    expect(documentCheckboxes()).toHaveLength(10)
+    expect(documentRows()).toHaveLength(10)
   })
 
   it('shows no-results and restores the register when going back to filled', async () => {
@@ -507,9 +458,6 @@ describe('demo states', () => {
     ).toBeInTheDocument()
 
     await choose(user, 'Wypełniony')
-    await waitFor(
-      () => expect(documentCheckboxes()).toHaveLength(10),
-      SEARCH_TIMEOUT,
-    )
+    await waitFor(() => expect(documentRows()).toHaveLength(10), SEARCH_TIMEOUT)
   })
 })

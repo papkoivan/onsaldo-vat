@@ -9,17 +9,13 @@ import { nextSort, sortDocuments } from './sortDocuments'
 const documents = documentsByRegister.sales
 const ids = (list: readonly VatDocument[]) => list.map((d) => d.id)
 
-const comparable: Record<SortKey, (d: VatDocument) => string | number | null> =
-  {
-    contractor: (d) => d.contractor,
-    issueDate: (d) => d.issueDate,
-    documentNumber: (d) => d.documentNumber,
-    ksefNumber: (d) => d.ksefNumber,
-    identifier: (d) => d.identifier,
-    netAmount: (d) => d.netAmount,
-    vatAmount: (d) => d.vatAmount,
-    grossAmount: (d) => d.grossAmount,
-  }
+const comparable: Record<SortKey, (d: VatDocument) => string | null> = {
+  contractor: (d) => d.contractor,
+  issueDate: (d) => d.issueDate,
+  documentNumber: (d) => d.documentNumber,
+  ksefNumber: (d) => d.ksefNumber,
+  identifier: (d) => d.identifier,
+}
 
 const sortKeys = Object.keys(comparable) as SortKey[]
 
@@ -32,10 +28,8 @@ describe('sortDocuments', () => {
 
     const ascValues = values(asc)
     const descValues = values(desc)
-    const compare = (a: string | number | null, b: string | number | null) =>
-      typeof a === 'number' && typeof b === 'number'
-        ? a - b
-        : String(a).localeCompare(String(b), 'pl', { numeric: true })
+    const compare = (a: string | null, b: string | null) =>
+      String(a).localeCompare(String(b), 'pl', { numeric: true })
 
     expect(ascValues).toEqual([...ascValues].sort(compare))
     expect(descValues).toEqual([...ascValues].sort(compare).reverse())
@@ -44,7 +38,7 @@ describe('sortDocuments', () => {
   it('does not mutate its input and keeps every document', () => {
     const before = ids(documents)
     const sorted = sortDocuments(documents, {
-      key: 'grossAmount',
+      key: 'contractor',
       direction: 'desc',
     })
     expect(ids(documents)).toEqual(before)
@@ -91,14 +85,6 @@ describe('sortDocuments', () => {
       { key: 'documentNumber', direction: 'asc' },
     )
     expect(ids(sorted)).toEqual(['FV/2026/10/0002', 'FV/2026/10/0010'])
-  })
-
-  it('sorts negative corrections below positive amounts', () => {
-    const sorted = sortDocuments(documents, {
-      key: 'netAmount',
-      direction: 'asc',
-    })
-    expect(sorted[0]?.netAmount).toBeLessThan(0)
   })
 
   it('does not change totals', () => {
