@@ -74,19 +74,12 @@ export function DocumentSection({
   const feedback = useFeedback()
   const { printedAt, print } = usePrintView()
 
-  const canResetAll =
-    filters.activeFilters.length > 0 || search.inputValue !== ''
   const hasDocuments = documents.length > 0
 
   const isFilled = viewState === 'filled'
   // nothing to search or filter while the register is empty, loading or failed
   const toolbarDisabled =
     viewState === 'empty' || viewState === 'loading' || viewState === 'error'
-
-  const handleResetAll = () => {
-    search.clear()
-    filters.clearAll()
-  }
 
   // the control that was just used disappears; keep keyboard and screen reader users anchored
   const focusTitle = () => document.getElementById(TITLE_ID)?.focus()
@@ -183,8 +176,6 @@ export function DocumentSection({
         onOpenFilters={filters.openDrawer}
         onPrint={hasDocuments ? print : undefined}
         onExport={hasDocuments ? exportDocuments : undefined}
-        canResetAll={canResetAll}
-        onResetAll={handleResetAll}
       />
       <ActiveFilters
         filters={

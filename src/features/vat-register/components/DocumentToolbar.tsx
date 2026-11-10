@@ -4,10 +4,8 @@ import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
-import RestartAltOutlined from '@mui/icons-material/RestartAltOutlined'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
 import IconButton from '@mui/material/IconButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
@@ -28,8 +26,6 @@ interface DocumentToolbarProps {
   onPrint?: () => void
   /** Undefined when there are no documents to export — the action stays disabled. */
   onExport?: () => void
-  canResetAll: boolean
-  onResetAll: () => void
 }
 
 // 44px touch targets below the tablet breakpoint, 40px from md up
@@ -57,8 +53,6 @@ export function DocumentToolbar({
   onOpenFilters,
   onPrint,
   onExport,
-  canResetAll,
-  onResetAll,
 }: DocumentToolbarProps) {
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const closeMenu = () => setMenuAnchor(null)
@@ -139,40 +133,25 @@ export function DocumentToolbar({
           open={menuAnchor !== null}
           onClose={closeMenu}
         >
-          {[
-            <MenuItem
-              key="print"
-              disabled={!onPrint}
-              onClick={handleMenuAction(onPrint)}
-              sx={menuItemSx}
-            >
-              <ListItemIcon>
-                <PrintOutlined fontSize="small" />
-              </ListItemIcon>
-              Drukuj wyniki
-            </MenuItem>,
-            <MenuItem
-              key="export"
-              disabled={!onExport}
-              onClick={handleMenuAction(onExport)}
-              sx={menuItemSx}
-            >
-              <ListItemIcon>
-                <FileDownloadOutlined fontSize="small" />
-              </ListItemIcon>
-              Eksportuj wyniki (CSV)
-            </MenuItem>,
-            <Divider key="divider" />,
-          ]}
           <MenuItem
-            disabled={!canResetAll}
-            onClick={handleMenuAction(onResetAll)}
+            disabled={!onPrint}
+            onClick={handleMenuAction(onPrint)}
             sx={menuItemSx}
           >
             <ListItemIcon>
-              <RestartAltOutlined fontSize="small" />
+              <PrintOutlined fontSize="small" />
             </ListItemIcon>
-            Wyczyść wyszukiwanie i filtry
+            Drukuj wyniki
+          </MenuItem>
+          <MenuItem
+            disabled={!onExport}
+            onClick={handleMenuAction(onExport)}
+            sx={menuItemSx}
+          >
+            <ListItemIcon>
+              <FileDownloadOutlined fontSize="small" />
+            </ListItemIcon>
+            Eksportuj wyniki (CSV)
           </MenuItem>
         </Menu>
       </Box>
