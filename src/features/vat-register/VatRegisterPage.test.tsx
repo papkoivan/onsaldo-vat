@@ -14,8 +14,8 @@ const SEARCH_TIMEOUT = { timeout: 2000 }
 
 const normalize = (text: string): string => text.replace(/\s+/g, ' ').trim()
 
-/** Independent of the app code: sums integer grosze of the October 2026 documents. */
-function expectedTotals(register: RegisterType, month = '2026-10') {
+/** Independent of the app code: sums integer grosze of all documents, or of one month (YYYY-MM). */
+function expectedTotals(register: RegisterType, month = '') {
   const documents = documentsByRegister[register].filter((document) =>
     document.issueDate.startsWith(month),
   )
@@ -67,7 +67,7 @@ beforeEach(() => {
 })
 
 describe('registers and financial summary', () => {
-  it('opens the sales register for the default period with a first page of 10', () => {
+  it('opens the sales register with no filters applied and a first page of 10', () => {
     setup()
     const totals = expectedTotals('sales')
 
@@ -297,8 +297,29 @@ describe('filters drawer', () => {
 
     await openDrawer(user)
     expect(screen.getByRole('combobox', { name: 'Miesiąc' })).toHaveTextContent(
-      'październik',
+      'Wszystkie',
     )
+  })
+
+  it('starts with no selected filters and no chips', async () => {
+    const user = setup()
+
+    expect(
+      screen.queryByRole('group', { name: 'Aktywne filtry' }),
+    ).not.toBeInTheDocument()
+
+    await openDrawer(user)
+    for (const name of [
+      'Rok',
+      'Miesiąc',
+      'Rodzaj operacji',
+      'Kod JPK V7',
+      'Serie dokumentów',
+    ]) {
+      expect(screen.getByRole('combobox', { name })).toHaveTextContent(
+        'Wszystkie',
+      )
+    }
   })
 
   it('applies filters, shows removable chips and clears them', async () => {
@@ -339,16 +360,17 @@ describe('filters drawer', () => {
 
   it('removes a single filter chip', async () => {
     const user = setup()
-    const chips = screen.getByRole('group', { name: 'Aktywne filtry' })
-    expect(within(chips).getByText('2026')).toBeInTheDocument()
+    await openDrawer(user)
+    await chooseMonth(user, 'październik')
+    await user.click(screen.getByRole('button', { name: 'Zastosuj filtry' }))
 
+    const chips = await screen.findByRole('group', { name: 'Aktywne filtry' })
     await user.click(within(chips).getByText('październik'))
     await user.keyboard('{Delete}')
 
+    expect(screen.queryByText('październik')).not.toBeInTheDocument()
     expect(
-      within(screen.getByRole('group', { name: 'Aktywne filtry' })).queryByText(
-        'październik',
-      ),
+      screen.queryByRole('group', { name: 'Aktywne filtry' }),
     ).not.toBeInTheDocument()
   })
 })

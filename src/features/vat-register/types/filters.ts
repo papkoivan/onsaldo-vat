@@ -36,9 +36,3 @@ export const EMPTY_FILTERS: VatFilters = {
   jpkCode: ALL_FILTER_VALUE,
   documentSeries: ALL_FILTER_VALUE,
 }
-
-export const DEFAULT_FILTERS: VatFilters = {
-  ...EMPTY_FILTERS,
-  year: '2026',
-  month: '10',
-}

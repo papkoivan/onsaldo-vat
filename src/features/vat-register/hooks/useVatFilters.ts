@@ -1,13 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
-import {
-  ALL_FILTER_VALUE,
-  DEFAULT_FILTERS,
-  EMPTY_FILTERS,
-} from '../types/filters'
+import { ALL_FILTER_VALUE, EMPTY_FILTERS } from '../types/filters'
 import type { FilterKey, VatFilters } from '../types/filters'
 import { getActiveFilters } from '../utils/filters'
 
-export function useVatFilters(initialFilters: VatFilters = DEFAULT_FILTERS) {
+export function useVatFilters(initialFilters: VatFilters = EMPTY_FILTERS) {
   const [appliedFilters, setAppliedFilters] = useState(initialFilters)
   const [draftFilters, setDraftFilters] = useState(initialFilters)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)

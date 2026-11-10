@@ -39,7 +39,7 @@ npm run format:check
 - **KSeF status** – each document has a status (confirmed, pending, rejected) shown as a chip; documents without a KSeF number show the status in place of the number.
 - **Document cards** (mobile, below 768 px) – expandable cards with every field; no horizontal overflow down to 320 px.
 - **Search** – by contractor, document number, KSeF number and identifier; diacritic- and case-insensitive; combines with filters.
-- **Filters drawer** – year, month, operation type, JPK V7 code, document series. The period is matched against the issue date, and the page opens with October 2026 already applied. Changes are drafts until "Zastosuj filtry"; closing the drawer discards them. Applied filters appear as removable chips.
+- **Filters drawer** – year, month, operation type, JPK V7 code, document series. The period is matched against the issue date, and the page opens with no filters applied. Changes are drafts until "Zastosuj filtry"; closing the drawer discards them. Applied filters appear as removable chips.
 - **Pagination** – 10 (default), 20 or 25 per page; goes back to page 1 on search, filter, sort and register changes.
 - **Actions** – in the "Więcej akcji" menu: CSV export of the filtered documents in the current sort order (UTF-8 with BOM, `;` separated, all fields plus netto/VAT per rate) and a print view (A4 landscape) of the same documents. The "Etykiety" menu item is a non-functional placeholder.
 - **States** – filled, empty, no results, loading (skeletons) and error with retry, switchable from the clearly marked **PROTOTYP** panel at the top of the page. "No results" is a preset that types a phrase matching nothing into the search box.
