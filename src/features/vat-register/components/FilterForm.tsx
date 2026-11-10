@@ -64,11 +64,7 @@ function FilterGroup({
 }) {
   return (
     <Box component="fieldset" sx={{ border: 0, m: 0, p: 0, minWidth: 0 }}>
-      <Typography
-        component="legend"
-        variant="subtitle2"
-        sx={{ fontWeight: 600, mb: 1.5, p: 0 }}
-      >
+      <Typography component="legend" variant="subtitle2" sx={{ mb: 1.5, p: 0 }}>
         {title}
       </Typography>
       {children}

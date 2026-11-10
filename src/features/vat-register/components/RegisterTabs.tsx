@@ -52,11 +52,6 @@ export function RegisterTabs({ value, onChange }: RegisterTabsProps) {
           label={tab.label}
           icon={compact ? undefined : tab.icon}
           iconPosition="start"
-          sx={{
-            px: { xs: 1, sm: 2 },
-            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-            lineHeight: 1.25,
-          }}
         />
       ))}
     </Tabs>

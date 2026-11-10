@@ -1,11 +1,8 @@
 import { colors } from '@/theme/tokens'
 import { WIDE_DESKTOP } from '../tableStyles'
 
-export const tableContainerSx = {
-  border: `1px solid ${colors.borderTable}`,
-  borderRadius: '12px',
-  backgroundColor: 'background.paper',
-} as const
+// used with `<TableContainer component={Paper} variant="card">`; tables get a stronger border
+export const tableContainerSx = { borderColor: colors.borderTable } as const
 
 // tighter horizontal rhythm below the wide-desktop breakpoint
 export const tableSx = {

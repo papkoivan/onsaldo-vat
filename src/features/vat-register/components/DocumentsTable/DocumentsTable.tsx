@@ -18,6 +18,7 @@ import {
   horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
+import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
@@ -108,7 +109,7 @@ export function DocumentsTable({
   }
 
   return (
-    <TableContainer sx={tableContainerSx}>
+    <TableContainer component={Paper} variant="card" sx={tableContainerSx}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

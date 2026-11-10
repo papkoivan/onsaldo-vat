@@ -4,6 +4,7 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
+import { layout } from '@/theme/tokens'
 import { useViewportDown } from '../hooks/useViewportDown'
 
 interface DocumentSearchProps {
@@ -61,7 +62,7 @@ export function DocumentSearch({
       }}
       sx={{
         '& .MuiOutlinedInput-root': {
-          height: { xs: 44, md: 40 },
+          height: layout.controlHeight,
           backgroundColor: 'background.paper',
         },
       }}

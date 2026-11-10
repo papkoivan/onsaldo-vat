@@ -25,10 +25,7 @@ interface DocumentsTableHeadProps {
 
 const headCellSx = {
   py: 1,
-  fontSize: '0.8125rem',
-  fontWeight: 600,
   whiteSpace: 'nowrap',
-  color: 'text.secondary',
   backgroundColor: colors.surfaceMuted,
 } as const
 

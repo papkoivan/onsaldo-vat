@@ -4,7 +4,6 @@ import ErrorOutlineOutlined from '@mui/icons-material/ErrorOutlineOutlined'
 import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined'
 import Chip from '@mui/material/Chip'
 import type { KsefStatus } from '@/domain/vat'
-import { colors } from '@/theme/tokens'
 import { KSEF_STATUS_LABELS } from '../utils/ksefStatus'
 
 interface KsefStatusChipProps {
@@ -14,51 +13,37 @@ interface KsefStatusChipProps {
 interface StatusAppearance {
   label: string
   icon: ReactElement
-  color: string
-  background: string
-  border: string
+  color: 'success' | 'warning' | 'error'
 }
 
 const appearance: Record<KsefStatus, StatusAppearance> = {
   confirmed: {
     label: KSEF_STATUS_LABELS.confirmed,
     icon: <CheckCircleOutlineOutlined />,
-    color: colors.successText,
-    background: colors.successBg,
-    border: colors.successBorder,
+    color: 'success',
   },
   pending: {
     label: KSEF_STATUS_LABELS.pending,
     icon: <ScheduleOutlined />,
-    color: colors.warningText,
-    background: colors.warningBg,
-    border: colors.warningBorder,
+    color: 'warning',
   },
   rejected: {
     label: KSEF_STATUS_LABELS.rejected,
     icon: <ErrorOutlineOutlined />,
-    color: colors.errorText,
-    background: colors.errorBg,
-    border: colors.errorBorder,
+    color: 'error',
   },
 }
 
 export function KsefStatusChip({ status }: KsefStatusChipProps) {
-  const { label, icon, color, background, border } = appearance[status]
+  const { label, icon, color } = appearance[status]
 
   return (
     <Chip
       size="small"
+      color={color}
       label={label}
       icon={icon}
-      sx={{
-        height: 24,
-        fontWeight: 600,
-        color,
-        backgroundColor: background,
-        border: `1px solid ${border}`,
-        '& .MuiChip-icon': { color, fontSize: 16 },
-      }}
+      sx={{ '& .MuiChip-icon': { fontSize: 16 } }}
     />
   )
 }

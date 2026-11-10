@@ -1,16 +1,15 @@
 import ChevronLeft from '@mui/icons-material/ChevronLeft'
 import ChevronRight from '@mui/icons-material/ChevronRight'
 import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Pagination from '@mui/material/Pagination'
 import Select from '@mui/material/Select'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { colors } from '@/theme/tokens'
 import { useViewportDown } from '../hooks/useViewportDown'
 import { PAGE_SIZE_OPTIONS } from '../hooks/usePagination'
 import type { PaginationState } from '../hooks/usePagination'
+import { OutlinedIconButton } from './OutlinedIconButton'
 
 interface DocumentsPaginationProps {
   pagination: PaginationState
@@ -43,13 +42,6 @@ function getPaginationItemLabel(
 }
 
 const PAGE_SIZE_LABEL_ID = 'documents-page-size-label'
-const compactButtonSx = {
-  width: 44,
-  height: 44,
-  border: `1px solid ${colors.border}`,
-  borderRadius: '8px',
-  backgroundColor: 'background.paper',
-} as const
 
 export function DocumentsPagination({ pagination }: DocumentsPaginationProps) {
   const compact = useViewportDown('md')
@@ -134,14 +126,13 @@ export function DocumentsPagination({ pagination }: DocumentsPaginationProps) {
         >
           <Tooltip title="Poprzednia strona">
             <span>
-              <IconButton
+              <OutlinedIconButton
                 aria-label="Poprzednia strona"
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
-                sx={compactButtonSx}
               >
                 <ChevronLeft />
-              </IconButton>
+              </OutlinedIconButton>
             </span>
           </Tooltip>
           <Typography
@@ -153,14 +144,13 @@ export function DocumentsPagination({ pagination }: DocumentsPaginationProps) {
           </Typography>
           <Tooltip title="Następna strona">
             <span>
-              <IconButton
+              <OutlinedIconButton
                 aria-label="Następna strona"
                 disabled={page >= pageCount}
                 onClick={() => setPage(page + 1)}
-                sx={compactButtonSx}
               >
                 <ChevronRight />
-              </IconButton>
+              </OutlinedIconButton>
             </span>
           </Tooltip>
         </Box>

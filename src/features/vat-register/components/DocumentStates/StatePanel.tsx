@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react'
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import { colors } from '@/theme/tokens'
 
@@ -16,9 +17,9 @@ interface StatePanelProps {
 }
 
 const tones: Record<StatePanelTone, { color: string; background: string }> = {
-  primary: { color: colors.primary, background: colors.primaryLight },
-  neutral: { color: colors.textSecondary, background: colors.surfaceMuted },
-  error: { color: colors.errorText, background: colors.errorBg },
+  primary: { color: 'primary.main', background: 'primary.light' },
+  neutral: { color: 'text.secondary', background: colors.surfaceMuted },
+  error: { color: 'error.main', background: 'error.light' },
 }
 
 export function StatePanel({
@@ -32,7 +33,8 @@ export function StatePanel({
   const { color, background } = tones[tone]
 
   return (
-    <Box
+    <Paper
+      variant="card"
       role={role}
       sx={{
         display: 'flex',
@@ -42,9 +44,6 @@ export function StatePanel({
         px: { xs: 2, md: 3 },
         py: { xs: 5, md: 7 },
         textAlign: 'center',
-        border: `1px solid ${colors.border}`,
-        borderRadius: '12px',
-        backgroundColor: 'background.paper',
       }}
     >
       <Box
@@ -63,7 +62,7 @@ export function StatePanel({
       >
         {icon}
       </Box>
-      <Typography component="h3" variant="h6" sx={{ fontWeight: 700 }}>
+      <Typography component="h3" variant="h6">
         {title}
       </Typography>
       <Typography
@@ -81,12 +80,11 @@ export function StatePanel({
             gap: 1,
             mt: 1,
             width: { xs: '100%', sm: 'auto' },
-            '& .MuiButton-root': { minHeight: 44 },
           }}
         >
           {actions}
         </Box>
       )}
-    </Box>
+    </Paper>
   )
 }

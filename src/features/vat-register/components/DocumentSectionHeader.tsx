@@ -26,7 +26,7 @@ export function DocumentSectionHeader({
         variant="h5"
         component="h2"
         tabIndex={-1}
-        sx={{ fontWeight: 700, '&:focus': { outline: 'none' } }}
+        sx={{ '&:focus': { outline: 'none' } }}
       >
         {title}
       </Typography>

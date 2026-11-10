@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
-import { colors } from '@/theme/tokens'
+import { layout } from '@/theme/tokens'
 import { visuallyHiddenSx } from '@/utils/a11y'
 import { DEFAULT_PAGE_SIZE } from '../../hooks/usePagination'
 import { DEFAULT_COLUMN_ORDER } from '../../types/columns'
@@ -31,7 +32,7 @@ function TextSkeleton({ width }: { width: number | string }) {
 
 function TableSkeleton() {
   return (
-    <TableContainer sx={tableContainerSx}>
+    <TableContainer component={Paper} variant="card" sx={tableContainerSx}>
       <Table size="small" sx={tableSx}>
         <DocumentsTableHead
           disabled
@@ -78,18 +79,16 @@ function CardsSkeleton() {
   return (
     <Box sx={{ display: 'grid', gap: 1.5 }}>
       {ROWS.map((row) => (
-        <Box
+        <Paper
           key={row}
+          variant="card"
           sx={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1fr) 44px',
+            gridTemplateColumns: `minmax(0, 1fr) ${layout.touchTarget}px`,
             alignItems: 'start',
             columnGap: 0.5,
             rowGap: 0.5,
             p: 1,
-            border: `1px solid ${colors.border}`,
-            borderRadius: '12px',
-            backgroundColor: 'background.paper',
           }}
         >
           <Box sx={{ pt: 0.75, minWidth: 0 }}>
@@ -119,7 +118,7 @@ function CardsSkeleton() {
               sx={{ borderRadius: '12px' }}
             />
           </Box>
-        </Box>
+        </Paper>
       ))}
     </Box>
   )

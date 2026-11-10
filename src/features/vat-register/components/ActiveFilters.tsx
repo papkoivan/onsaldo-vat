@@ -54,11 +54,7 @@ export function ActiveFilters({
           }}
         />
       ))}
-      <Button
-        size="small"
-        onClick={onClearAll}
-        sx={{ minHeight: { xs: 44, md: 'auto' } }}
-      >
+      <Button size="small" onClick={onClearAll}>
         Wyczyść filtry
       </Button>
     </Stack>

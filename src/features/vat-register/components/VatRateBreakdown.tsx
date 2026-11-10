@@ -56,23 +56,11 @@ export function VatRateBreakdown({ items, status }: VatRateBreakdownProps) {
   const rows = useMemo(() => buildBreakdownRows(items), [items])
 
   return (
-    <Accordion
-      disableGutters
-      elevation={0}
-      square={false}
-      slotProps={{ heading: { component: 'h2' } }}
-      sx={{
-        border: `1px solid ${colors.border}`,
-        borderRadius: '12px !important',
-        backgroundColor: 'background.paper',
-        '&::before': { display: 'none' },
-      }}
-    >
+    <Accordion slotProps={{ heading: { component: 'h2' } }}>
       <AccordionSummary
         expandIcon={<ExpandMore />}
         aria-controls="vat-rate-breakdown-content"
         id="vat-rate-breakdown-header"
-        sx={{ minHeight: 52, px: { xs: 2, md: 2.5 } }}
         slotProps={{
           content: {
             sx: { flexWrap: 'wrap', alignItems: 'baseline', columnGap: 1 },
@@ -88,7 +76,7 @@ export function VatRateBreakdown({ items, status }: VatRateBreakdownProps) {
           VAT · DEMO
         </Typography>
       </AccordionSummary>
-      <AccordionDetails sx={{ px: { xs: 2, md: 2.5 }, pt: 0.5, pb: 2 }}>
+      <AccordionDetails>
         {status === 'loading' ? (
           <BreakdownLoading />
         ) : status === 'unavailable' ? (

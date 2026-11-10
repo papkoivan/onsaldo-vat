@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { colors } from '@/theme/tokens'
+import { touchTargetSx } from '@/utils/a11y'
 import type { FilterKey, FilterOption, VatFilters } from '../types/filters'
 import { FilterForm } from './FilterForm'
 
@@ -20,6 +21,7 @@ interface FiltersDrawerProps {
 }
 
 const TITLE_ID = 'filters-drawer-title'
+const INSET_X = { xs: 2, sm: 3 } as const
 
 export function FiltersDrawer({
   open,
@@ -57,19 +59,14 @@ export function FiltersDrawer({
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           gap: 2,
-          px: { xs: 2, sm: 3 },
+          px: INSET_X,
           pt: 2.5,
           pb: 2,
           borderBottom: `1px solid ${colors.border}`,
         }}
       >
         <Box>
-          <Typography
-            id={TITLE_ID}
-            variant="h6"
-            component="h2"
-            sx={{ fontWeight: 700 }}
-          >
+          <Typography id={TITLE_ID} variant="h6" component="h2">
             Filtry
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -81,14 +78,14 @@ export function FiltersDrawer({
             edge="end"
             aria-label="Zamknij filtry"
             onClick={onClose}
-            sx={{ mt: -0.5, width: 44, height: 44 }}
+            sx={{ mt: -0.5, ...touchTargetSx }}
           >
             <CloseOutlined />
           </IconButton>
         </Tooltip>
       </Box>
 
-      <Box sx={{ flex: 1, overflowY: 'auto', px: { xs: 2, sm: 3 }, py: 3 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', px: INSET_X, py: 3 }}>
         <FilterForm values={values} options={options} onChange={onChange} />
       </Box>
 
@@ -97,27 +94,17 @@ export function FiltersDrawer({
         sx={{
           display: 'flex',
           gap: 1.5,
-          px: { xs: 2, sm: 3 },
+          px: INSET_X,
           pt: 2,
           pb: 'max(16px, env(safe-area-inset-bottom))',
           borderTop: `1px solid ${colors.border}`,
           backgroundColor: 'background.paper',
         }}
       >
-        <Button
-          variant="outlined"
-          color="inherit"
-          onClick={onReset}
-          sx={{ minHeight: 44 }}
-        >
+        <Button variant="outlined" color="inherit" onClick={onReset}>
           Wyczyść
         </Button>
-        <Button
-          variant="contained"
-          fullWidth
-          onClick={onApply}
-          sx={{ minHeight: 44 }}
-        >
+        <Button variant="contained" fullWidth onClick={onApply}>
           Zastosuj filtry
         </Button>
       </Box>

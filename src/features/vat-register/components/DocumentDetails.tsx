@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import Box from '@mui/material/Box'
+import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -69,25 +70,12 @@ function DetailSection({
   fullWidthOnTablet = false,
 }: DetailSectionProps) {
   const isCard = variant === 'card'
-
-  return (
-    <Box
-      component="section"
-      sx={{
-        minWidth: 0,
-        ...(isCard
-          ? { pt: 2, borderTop: `1px solid ${colors.border}` }
-          : {
-              p: 2,
-              borderRadius: '8px',
-              border: `1px solid ${colors.border}`,
-              backgroundColor: 'background.paper',
-            }),
-        ...(fullWidthOnTablet && {
-          gridColumn: { md: '1 / -1', lg: 'auto' },
-        }),
-      }}
-    >
+  const sx = {
+    minWidth: 0,
+    ...(fullWidthOnTablet && { gridColumn: { md: '1 / -1', lg: 'auto' } }),
+  }
+  const content = (
+    <>
       <Typography
         variant="subtitle2"
         // a card's own title is an h3, so its sections sit one level below
@@ -97,7 +85,20 @@ function DetailSection({
         {title}
       </Typography>
       {children}
+    </>
+  )
+
+  return isCard ? (
+    <Box
+      component="section"
+      sx={{ ...sx, pt: 2, borderTop: `1px solid ${colors.border}` }}
+    >
+      {content}
     </Box>
+  ) : (
+    <Paper component="section" variant="outlined" sx={{ ...sx, p: 2 }}>
+      {content}
+    </Paper>
   )
 }
 
@@ -150,13 +151,7 @@ function DetailRow({
   )
 }
 
-const compactHeadCellSx = {
-  px: 0,
-  py: 0.5,
-  fontSize: '0.75rem',
-  fontWeight: 600,
-  color: 'text.secondary',
-} as const
+const compactHeadCellSx = { px: 0, py: 0.5, fontSize: '0.75rem' } as const
 
 const compactBodyCellSx = { px: 0, py: 0.5, fontSize: '0.8125rem' } as const
 

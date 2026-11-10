@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
-import { colors } from '@/theme/tokens'
+import { colors, layout } from '@/theme/tokens'
 import { useViewportDown } from '../hooks/useViewportDown'
 import type { VatViewState } from '../types/viewState'
 
@@ -55,9 +55,6 @@ export function DemoStateSwitcher({ value, onChange }: DemoStateSwitcherProps) {
             fontWeight: 700,
             fontSize: '0.6875rem',
             letterSpacing: '0.04em',
-            color: colors.textSecondary,
-            backgroundColor: 'background.paper',
-            border: `1px solid ${colors.border}`,
           }}
         />
         <Typography variant="caption" color="text.secondary">
@@ -81,7 +78,7 @@ export function DemoStateSwitcher({ value, onChange }: DemoStateSwitcherProps) {
             }}
             sx={{
               '& .MuiInputBase-root': {
-                minHeight: 44,
+                minHeight: layout.touchTarget,
                 backgroundColor: 'background.paper',
               },
             }}
@@ -90,7 +87,7 @@ export function DemoStateSwitcher({ value, onChange }: DemoStateSwitcherProps) {
               <MenuItem
                 key={option.value}
                 value={option.value}
-                sx={{ minHeight: 44 }}
+                sx={{ minHeight: layout.touchTarget }}
               >
                 {option.label}
               </MenuItem>
@@ -108,11 +105,7 @@ export function DemoStateSwitcher({ value, onChange }: DemoStateSwitcherProps) {
             sx={{ backgroundColor: 'background.paper' }}
           >
             {OPTIONS.map((option) => (
-              <ToggleButton
-                key={option.value}
-                value={option.value}
-                sx={{ textTransform: 'none', fontWeight: 600, px: 1.5 }}
-              >
+              <ToggleButton key={option.value} value={option.value}>
                 {option.label}
               </ToggleButton>
             ))}

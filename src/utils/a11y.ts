@@ -1,3 +1,11 @@
+import { layout } from '@/theme/tokens'
+
+/** Minimum pointer target size (WCAG 2.5.5) for icon-only buttons. */
+export const touchTargetSx = {
+  width: layout.touchTarget,
+  height: layout.touchTarget,
+} as const
+
 /** Text for screen readers only (equivalent of the usual `.sr-only` class). */
 export const visuallyHiddenSx = {
   position: 'absolute',

@@ -1,7 +1,6 @@
 import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import { colors } from '@/theme/tokens'
 
 export interface PageHeaderBadge {
   label: string
@@ -15,18 +14,7 @@ interface PageHeaderProps {
   badges: readonly PageHeaderBadge[]
 }
 
-const badgeStyles = {
-  warning: {
-    backgroundColor: colors.warningBg,
-    border: `1px solid ${colors.warningBorder}`,
-    color: colors.warningText,
-  },
-  neutral: {
-    backgroundColor: colors.surface,
-    border: `1px solid ${colors.border}`,
-    color: colors.textSecondary,
-  },
-} as const
+const badgeColors = { warning: 'warning', neutral: 'default' } as const
 
 export function PageHeader({
   companyName,
@@ -53,16 +41,7 @@ export function PageHeader({
         >
           {companyName}
         </Typography>
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{
-            fontWeight: 700,
-            lineHeight: 1.2,
-            mt: 0.25,
-            fontSize: { xs: '1.75rem', md: '2.125rem' },
-          }}
-        >
+        <Typography variant="h4" component="h1" sx={{ mt: 0.25 }}>
           {title}
         </Typography>
         <Typography color="text.secondary" sx={{ mt: 0.5 }}>
@@ -75,11 +54,8 @@ export function PageHeader({
             key={badge.label}
             label={badge.label}
             size="small"
-            sx={{
-              fontWeight: 600,
-              fontSize: '0.75rem',
-              ...badgeStyles[badge.tone],
-            }}
+            color={badgeColors[badge.tone]}
+            sx={{ fontSize: '0.75rem' }}
           />
         ))}
       </Stack>

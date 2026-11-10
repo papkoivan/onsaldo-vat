@@ -3,10 +3,12 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import Box from '@mui/material/Box'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
+import Paper from '@mui/material/Paper'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import type { VatDocument } from '@/domain/vat'
-import { colors } from '@/theme/tokens'
+import { layout } from '@/theme/tokens'
+import { touchTargetSx } from '@/utils/a11y'
 import { formatDate } from '@/utils/format'
 import { DocumentDetails } from '../DocumentDetails'
 import { KsefStatusChip } from '../KsefStatusChip'
@@ -16,8 +18,6 @@ interface DocumentCardProps {
   expanded: boolean
   onToggleExpand: (id: string) => void
 }
-
-const TOUCH_TARGET = 44
 
 export function DocumentCard({
   document,
@@ -38,20 +38,12 @@ export function DocumentCard({
   }
 
   return (
-    <Box
-      component="li"
-      sx={{
-        overflow: 'hidden',
-        border: `1px solid ${colors.border}`,
-        borderRadius: '12px',
-        backgroundColor: 'background.paper',
-      }}
-    >
+    <Paper component="li" variant="card" sx={{ overflow: 'hidden' }}>
       <Box
         onClick={handleHeaderClick}
         sx={{
           display: 'grid',
-          gridTemplateColumns: `minmax(0, 1fr) ${TOUCH_TARGET}px`,
+          gridTemplateColumns: `minmax(0, 1fr) ${layout.touchTarget}px`,
           alignItems: 'start',
           columnGap: 0.5,
           rowGap: 0.5,
@@ -91,7 +83,7 @@ export function DocumentCard({
             aria-expanded={expanded}
             aria-controls={detailsId}
             onClick={() => onToggleExpand(document.id)}
-            sx={{ width: TOUCH_TARGET, height: TOUCH_TARGET }}
+            sx={touchTargetSx}
           >
             <ExpandMore
               sx={{
@@ -118,6 +110,6 @@ export function DocumentCard({
       <Collapse in={expanded} timeout="auto">
         <DocumentDetails document={document} id={detailsId} variant="card" />
       </Collapse>
-    </Box>
+    </Paper>
   )
 }

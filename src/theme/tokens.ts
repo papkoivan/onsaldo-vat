@@ -31,6 +31,10 @@ export const layout = {
   pagePaddingXMobile: 16,
   maxContentWidth: 1680,
   radius: 8,
+  radiusLg: 12,
+  touchTarget: 44,
+  // 44px touch targets below the tablet breakpoint, 40px from md up
+  controlHeight: { xs: 44, md: 40 },
 } as const
 
 export const fontFamily =

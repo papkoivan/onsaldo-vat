@@ -7,13 +7,13 @@ import MoreHoriz from '@mui/icons-material/MoreHoriz'
 import PrintOutlined from '@mui/icons-material/PrintOutlined'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import Tooltip from '@mui/material/Tooltip'
-import { colors } from '@/theme/tokens'
+import { layout } from '@/theme/tokens'
 import { DocumentSearch } from './DocumentSearch'
+import { OutlinedIconButton } from './OutlinedIconButton'
 
 interface DocumentToolbarProps {
   /** Search, filters and the actions menu are unavailable (no data to work on). */
@@ -29,21 +29,7 @@ interface DocumentToolbarProps {
   onExport?: () => void
 }
 
-// 44px touch targets below the tablet breakpoint, 40px from md up
-const buttonSize = { xs: 44, md: 40 } as const
-
-const outlinedButtonSx = {
-  width: buttonSize,
-  height: buttonSize,
-  border: `1px solid ${colors.border}`,
-  borderRadius: '8px',
-  backgroundColor: 'background.paper',
-  color: 'text.primary',
-  '&:hover': { backgroundColor: colors.surfaceMuted },
-  '&.Mui-disabled': { backgroundColor: colors.surfaceMuted },
-} as const
-
-const menuItemSx = { minHeight: 44 } as const
+const menuItemSx = { minHeight: layout.touchTarget } as const
 
 export function DocumentToolbar({
   disabled = false,
@@ -93,6 +79,8 @@ export function DocumentToolbar({
       >
         <Button
           variant="outlined"
+          color="inherit"
+          data-active={activeFilterCount > 0}
           startIcon={<FilterAltOutlined />}
           onClick={onOpenFilters}
           disabled={disabled}
@@ -101,33 +89,13 @@ export function DocumentToolbar({
             flexGrow: { xs: 1, md: 0 },
             minWidth: 0,
             px: { xs: 1.5, md: 2 },
-            height: buttonSize,
-            ...(activeFilterCount > 0
-              ? {
-                  color: 'primary.main',
-                  borderColor: 'primary.main',
-                  backgroundColor: 'primary.light',
-                  '&:hover': {
-                    borderColor: 'primary.dark',
-                    backgroundColor: 'primary.light',
-                  },
-                }
-              : {
-                  color: 'text.primary',
-                  borderColor: colors.border,
-                  backgroundColor: 'background.paper',
-                  '&:hover': {
-                    borderColor: colors.border,
-                    backgroundColor: colors.surfaceMuted,
-                  },
-                  '&.Mui-disabled': { backgroundColor: colors.surfaceMuted },
-                }),
+            minHeight: layout.controlHeight,
           }}
         >
           {activeFilterCount > 0 ? `Filtry (${activeFilterCount})` : 'Filtry'}
         </Button>
         <Tooltip title="Więcej akcji">
-          <IconButton
+          <OutlinedIconButton
             aria-label="Więcej akcji"
             disabled={disabled}
             aria-haspopup="menu"
@@ -136,10 +104,10 @@ export function DocumentToolbar({
             onClick={(event: MouseEvent<HTMLElement>) =>
               setMenuAnchor(event.currentTarget)
             }
-            sx={outlinedButtonSx}
+            sx={{ width: layout.controlHeight, height: layout.controlHeight }}
           >
             <MoreHoriz />
-          </IconButton>
+          </OutlinedIconButton>
         </Tooltip>
         <Menu
           id="document-more-menu"

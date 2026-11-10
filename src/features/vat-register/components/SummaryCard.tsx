@@ -17,7 +17,7 @@ interface SummaryCardProps {
 export function SummaryCard({ label, value, icon, status }: SummaryCardProps) {
   return (
     <Paper
-      variant="outlined"
+      variant="card"
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -25,8 +25,6 @@ export function SummaryCard({ label, value, icon, status }: SummaryCardProps) {
         minWidth: 0,
         px: { xs: 2, md: 2.5 },
         py: { xs: 1.25, md: 1.75 },
-        borderRadius: '12px',
-        backgroundColor: 'background.paper',
       }}
     >
       <Box
