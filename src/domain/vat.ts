@@ -1,6 +1,7 @@
 export type RegisterType = 'sales' | 'purchases'
 
-export type VatRate = number | 'np'
+/** Only 23% and "np" (not subject to VAT) occur in the demo registers. */
+export type VatRate = 23 | 'np'
 
 export interface VatBreakdownItem {
   rate: VatRate
@@ -15,7 +16,7 @@ export interface VatTotals {
 }
 
 export interface VatBreakdownRow extends VatBreakdownItem {
-  /** Fraction of total net amount, 0..1 */
+  /** Fraction of the total VAT amount, 0..1 */
   share: number
 }
 

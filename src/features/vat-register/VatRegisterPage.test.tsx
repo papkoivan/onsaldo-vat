@@ -157,6 +157,41 @@ describe('search', () => {
   })
 })
 
+describe('VAT rate breakdown', () => {
+  it('is collapsed by default and lists the VAT amount per rate once expanded', async () => {
+    const user = setup()
+    const toggle = screen.getByRole('button', {
+      name: 'Kwoty według stawek VAT VAT · DEMO',
+    })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    const list = screen.getByRole('list', { name: 'Kwoty według stawek VAT' })
+    const rows = within(list).getAllByRole('listitem')
+    expect(rows.map((row) => row.firstElementChild?.textContent)).toEqual([
+      '23%',
+      'np',
+    ])
+
+    // 23% is the only rate with VAT, so it carries the whole VAT total of the summary
+    const [rate23, notSubject] = rows
+    expect(normalize(rate23?.textContent ?? '')).toContain(
+      normalize(formatCurrency(expectedTotals('sales').vat)),
+    )
+    expect(normalize(notSubject?.textContent ?? '')).toContain(
+      normalize(formatCurrency(0)),
+    )
+    const bars = within(list).getAllByRole('progressbar')
+    expect(bars.map((bar) => bar.getAttribute('aria-valuenow'))).toEqual([
+      '100',
+      '0',
+    ])
+    expect(screen.queryByText('Razem')).not.toBeInTheDocument()
+  })
+})
+
 describe('documents table', () => {
   it('shows only identification columns, with amounts moved to the expanded row', async () => {
     const user = setup()
@@ -356,7 +391,10 @@ describe('CSV export', () => {
     const user = setup()
     const { count } = expectedTotals('sales')
 
-    await user.click(screen.getByRole('button', { name: 'Eksportuj do CSV' }))
+    await user.click(screen.getByRole('button', { name: 'Więcej akcji' }))
+    await user.click(
+      screen.getByRole('menuitem', { name: 'Eksportuj wyniki (CSV)' }),
+    )
 
     expect(downloadTextFile).toHaveBeenCalledTimes(1)
     const [filename, content, mimeType] =
@@ -378,7 +416,8 @@ describe('print', () => {
     const user = setup()
     window.print = vi.fn()
 
-    await user.click(screen.getByRole('button', { name: 'Drukuj' }))
+    await user.click(screen.getByRole('button', { name: 'Więcej akcji' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Drukuj wyniki' }))
     expect(window.print).toHaveBeenCalledTimes(1)
 
     window.dispatchEvent(new Event('beforeprint'))
@@ -413,9 +452,7 @@ describe('demo states', () => {
 
     expect(screen.getByText('Brak dokumentów')).toBeInTheDocument()
     expectSummary({ net: 0, vat: 0, gross: 0 })
-    expect(
-      screen.getByRole('button', { name: 'Eksportuj do CSV' }),
-    ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Więcej akcji' })).toBeDisabled()
     expect(
       screen.getByRole('textbox', { name: 'Szukaj dokumentów' }),
     ).toBeDisabled()

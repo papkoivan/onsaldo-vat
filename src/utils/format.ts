@@ -8,29 +8,11 @@ const currencyFormatter = new Intl.NumberFormat('pl-PL', {
   useGrouping: 'always',
 })
 
-const percentFormatter = new Intl.NumberFormat('pl-PL', {
-  style: 'percent',
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-})
-
 export const formatCurrency = (value: number): string =>
   currencyFormatter.format(value)
 
-/** @param fraction value in range 0..1 */
-export const formatPercent = (fraction: number): string =>
-  percentFormatter.format(fraction)
-
-const dateFormatter = new Intl.DateTimeFormat('pl-PL', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  timeZone: 'UTC',
-})
-
-/** @param isoDate calendar date in `YYYY-MM-DD` form */
-export const formatDate = (isoDate: string): string =>
-  dateFormatter.format(new Date(isoDate))
+/** Calendar dates are shown in their ISO `YYYY-MM-DD` form. */
+export const formatDate = (isoDate: string): string => isoDate
 
 /** Polish NIPs are shown as `XXX-XXX-XX-XX`; foreign VAT IDs are kept as is. */
 export const formatNip = (nip: string): string =>

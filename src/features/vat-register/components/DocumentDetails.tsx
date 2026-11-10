@@ -228,7 +228,7 @@ export function DocumentDetails({
         <Table
           size="small"
           aria-label="Kwoty według stawek VAT"
-          sx={{ mt: 1.5, '& td, & th': { borderColor: colors.border } }}
+          sx={{ mt: 1.5, '& td, & th': { borderColor: colors.borderTable } }}
         >
           <TableHead>
             <TableRow>

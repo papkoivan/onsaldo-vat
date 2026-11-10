@@ -38,7 +38,7 @@ describe('buildDocumentsCsv', () => {
     const [, row] = lines(buildDocumentsCsv([document]))
     expect(row).toContain('"Firma ""Alfa"", Sp. z o.o."')
     expect(row).toContain('525-000-00-00')
-    expect(row).toContain('30.10.2026;29.10.2026')
+    expect(row).toContain('2026-10-30;2026-10-29')
     expect(row).toContain('Brak potwierdzenia')
     expect(row).toContain('"1000,00";"230,00";"1230,00"')
   })

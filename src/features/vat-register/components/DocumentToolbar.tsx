@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { MouseEvent, ReactElement } from 'react'
+import type { MouseEvent } from 'react'
 import FileDownloadOutlined from '@mui/icons-material/FileDownloadOutlined'
 import FilterAltOutlined from '@mui/icons-material/FilterAltOutlined'
 import MoreHoriz from '@mui/icons-material/MoreHoriz'
@@ -14,14 +14,11 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import Tooltip from '@mui/material/Tooltip'
 import { colors } from '@/theme/tokens'
-import { useViewportDown } from '../hooks/useViewportDown'
 import { DocumentSearch } from './DocumentSearch'
 
 interface DocumentToolbarProps {
   /** Search, filters and the actions menu are unavailable (no data to work on). */
   disabled?: boolean
-  /** Replaces the default tooltip hint on actions that need documents. */
-  unavailableReason?: string
   searchValue: string
   onSearchChange: (value: string) => void
   onSearchClear: () => void
@@ -33,13 +30,6 @@ interface DocumentToolbarProps {
   onExport?: () => void
   canResetAll: boolean
   onResetAll: () => void
-}
-
-interface ToolbarIconButtonProps {
-  label: string
-  icon: ReactElement
-  onClick?: (event: MouseEvent<HTMLElement>) => void
-  disabledHint: string
 }
 
 // 44px touch targets below the tablet breakpoint, 40px from md up
@@ -58,33 +48,8 @@ const outlinedButtonSx = {
 
 const menuItemSx = { minHeight: 44 } as const
 
-function ToolbarIconButton({
-  label,
-  icon,
-  onClick,
-  disabledHint,
-}: ToolbarIconButtonProps) {
-  const disabled = onClick === undefined
-
-  return (
-    <Tooltip title={disabled ? `${label} — ${disabledHint}` : label}>
-      <span>
-        <IconButton
-          aria-label={label}
-          disabled={disabled}
-          onClick={onClick}
-          sx={outlinedButtonSx}
-        >
-          {icon}
-        </IconButton>
-      </span>
-    </Tooltip>
-  )
-}
-
 export function DocumentToolbar({
   disabled = false,
-  unavailableReason,
   searchValue,
   onSearchChange,
   onSearchClear,
@@ -95,7 +60,6 @@ export function DocumentToolbar({
   canResetAll,
   onResetAll,
 }: DocumentToolbarProps) {
-  const compact = useViewportDown('sm')
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
   const closeMenu = () => setMenuAnchor(null)
 
@@ -154,22 +118,6 @@ export function DocumentToolbar({
         >
           {activeFilterCount > 0 ? `Filtry (${activeFilterCount})` : 'Filtry'}
         </Button>
-        {!compact && (
-          <>
-            <ToolbarIconButton
-              label="Drukuj"
-              icon={<PrintOutlined />}
-              onClick={onPrint}
-              disabledHint={unavailableReason ?? 'brak dokumentów do wydruku'}
-            />
-            <ToolbarIconButton
-              label="Eksportuj do CSV"
-              icon={<FileDownloadOutlined />}
-              onClick={onExport}
-              disabledHint={unavailableReason ?? 'brak dokumentów do eksportu'}
-            />
-          </>
-        )}
         <Tooltip title="Więcej akcji">
           <IconButton
             aria-label="Więcej akcji"
@@ -191,7 +139,7 @@ export function DocumentToolbar({
           open={menuAnchor !== null}
           onClose={closeMenu}
         >
-          {compact && [
+          {[
             <MenuItem
               key="print"
               disabled={!onPrint}

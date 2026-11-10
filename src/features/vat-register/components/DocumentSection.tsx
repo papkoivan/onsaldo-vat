@@ -48,13 +48,6 @@ interface DocumentSectionProps {
 
 const TITLE_ID = 'documents-section-title'
 
-const UNAVAILABLE_REASONS: Partial<Record<VatViewState, string>> = {
-  empty: 'rejestr nie zawiera dokumentów',
-  'no-results': 'brak dokumentów spełniających kryteria',
-  loading: 'trwa ładowanie danych',
-  error: 'dane są niedostępne',
-}
-
 export function DocumentSection({
   register,
   companyName,
@@ -183,7 +176,6 @@ export function DocumentSection({
       />
       <DocumentToolbar
         disabled={toolbarDisabled}
-        unavailableReason={UNAVAILABLE_REASONS[viewState]}
         searchValue={search.inputValue}
         onSearchChange={search.setInputValue}
         onSearchClear={search.clear}

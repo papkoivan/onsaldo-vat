@@ -29,15 +29,8 @@ export const calculateVatAmount = (netAmount: number, rate: VatRate): number =>
     ? 0
     : fromCents(roundHalfAwayFromZero((toCents(netAmount) * rate) / 100))
 
-/** Rates that are always listed in the breakdown, in display order. */
-const STANDARD_RATES: readonly VatRate[] = [23, 8, 5, 0, 'np']
-
-const rateOrder = (rate: VatRate): number => {
-  const index = STANDARD_RATES.indexOf(rate)
-  if (index !== -1) return index
-  // non-standard rates follow the standard ones, highest first ('np' is always standard)
-  return STANDARD_RATES.length + (typeof rate === 'number' ? 100 - rate : 0)
-}
+/** Rates listed in the breakdown, in display order, even when their amounts are zero. */
+const RATES: readonly VatRate[] = [23, 'np']
 
 export function calculateTotals(items: readonly VatBreakdownItem[]): VatTotals {
   const netAmount = sumMoney(items.map((item) => item.netAmount))
@@ -59,41 +52,29 @@ export function calculateDocumentTotals(
   }
 }
 
-/** Sums document breakdowns per VAT rate; standard rates are listed even when zero. */
+/** Sums document breakdowns per VAT rate; every rate is listed, even when zero. */
 export function aggregateVatBreakdown(
   documents: readonly VatDocument[],
 ): VatBreakdownItem[] {
-  const byRate = new Map<VatRate, VatBreakdownItem>(
-    STANDARD_RATES.map((rate) => [rate, { rate, netAmount: 0, vatAmount: 0 }]),
-  )
+  const lines = documents.flatMap((document) => document.vatBreakdown)
 
-  for (const { vatBreakdown } of documents) {
-    for (const item of vatBreakdown) {
-      const current = byRate.get(item.rate) ?? {
-        rate: item.rate,
-        netAmount: 0,
-        vatAmount: 0,
-      }
-      byRate.set(item.rate, {
-        rate: item.rate,
-        netAmount: sumMoney([current.netAmount, item.netAmount]),
-        vatAmount: sumMoney([current.vatAmount, item.vatAmount]),
-      })
+  return RATES.map((rate) => {
+    const ofRate = lines.filter((line) => line.rate === rate)
+    return {
+      rate,
+      netAmount: sumMoney(ofRate.map((line) => line.netAmount)),
+      vatAmount: sumMoney(ofRate.map((line) => line.vatAmount)),
     }
-  }
-
-  return [...byRate.values()].sort(
-    (a, b) => rateOrder(a.rate) - rateOrder(b.rate),
-  )
+  })
 }
 
 export function buildBreakdownRows(
   items: readonly VatBreakdownItem[],
 ): VatBreakdownRow[] {
-  const { netAmount: totalNet } = calculateTotals(items)
+  const { vatAmount: totalVat } = calculateTotals(items)
   return items.map((item) => ({
     ...item,
     // corrections can make a single rate negative; keep the bar within 0..1
-    share: totalNet > 0 ? Math.max(0, item.netAmount / totalNet) : 0,
+    share: totalVat > 0 ? Math.max(0, item.vatAmount / totalVat) : 0,
   }))
 }

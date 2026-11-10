@@ -32,7 +32,7 @@ npm run format:check
 
 - **Registers** – sales and purchases tabs, each with its own documents; switching resets the register-specific filters.
 - **Financial summary** – Netto / VAT / Brutto, always visible and calculated from _all_ documents matching the search and filters (not only the current page).
-- **VAT rate breakdown** – collapsible "Kwoty według stawek VAT" with net, VAT and share per rate.
+- **VAT rate breakdown** – collapsible "Kwoty według stawek VAT" with the VAT amount and its share of total VAT for each rate (23% and np).
 - **Documents table** (desktop/tablet) – sortable identification columns (contractor, date, document number, KSeF number, identifier) and expandable rows (several at once). Amounts (netto, VAT, brutto), VAT rate breakdown and all other fields are in the expanded row.
 - **Document cards** (mobile) – expandable cards with every field; no horizontal overflow down to 320 px.
 - **Search** – by contractor, document number, KSeF number and identifier; diacritic- and case-insensitive; combines with filters.

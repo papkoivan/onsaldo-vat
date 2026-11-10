@@ -2,7 +2,7 @@ import { colors } from '@/theme/tokens'
 import { WIDE_DESKTOP } from '../tableStyles'
 
 export const tableContainerSx = {
-  border: `1px solid ${colors.border}`,
+  border: `1px solid ${colors.borderTable}`,
   borderRadius: '12px',
   backgroundColor: 'background.paper',
 } as const

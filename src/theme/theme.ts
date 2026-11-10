@@ -45,6 +45,9 @@ export const theme = createTheme({
         },
       },
     },
+    MuiTableCell: {
+      styleOverrides: { root: { borderBottomColor: colors.borderTable } },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         notchedOutline: { borderColor: colors.borderInput },

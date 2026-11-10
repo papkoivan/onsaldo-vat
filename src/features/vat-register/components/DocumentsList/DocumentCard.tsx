@@ -109,7 +109,6 @@ export function DocumentCard({
             alignItems: 'center',
             columnGap: 1.5,
             rowGap: 0.5,
-            px: 1,
             pb: 0.75,
           }}
         >

@@ -49,14 +49,13 @@ describe('money arithmetic', () => {
   it('computes VAT on whole grosze, rounding half up', () => {
     expect(calculateVatAmount(8450.5, 23)).toBe(1943.62)
     expect(calculateVatAmount(0.5, 23)).toBe(0.12)
-    expect(calculateVatAmount(100, 8)).toBe(8)
+    expect(calculateVatAmount(100, 23)).toBe(23)
   })
 
-  it('gives negative VAT for corrections and none for np / 0%', () => {
+  it('gives negative VAT for corrections and none for np', () => {
     expect(calculateVatAmount(-1500, 23)).toBe(-345)
     expect(calculateVatAmount(-0.5, 23)).toBe(-0.12)
     expect(calculateVatAmount(1000, 'np')).toBe(0)
-    expect(calculateVatAmount(1000, 0)).toBe(0)
   })
 })
 
@@ -64,12 +63,12 @@ describe('calculateTotals', () => {
   it('keeps net + VAT = gross', () => {
     const totals = calculateTotals([
       { rate: 23, netAmount: 100.1, vatAmount: 23.02 },
-      { rate: 8, netAmount: 200.2, vatAmount: 16.02 },
+      { rate: 'np', netAmount: 200.2, vatAmount: 0 },
     ])
     expect(totals).toEqual({
       netAmount: 300.3,
-      vatAmount: 39.04,
-      grossAmount: 339.34,
+      vatAmount: 23.02,
+      grossAmount: 323.32,
     })
   })
 })
@@ -97,13 +96,10 @@ describe('calculateDocumentTotals', () => {
 })
 
 describe('aggregateVatBreakdown', () => {
-  it('lists the standard rates in order even when they are zero', () => {
-    expect(aggregateVatBreakdown([]).map((item) => item.rate)).toEqual([
-      23,
-      8,
-      5,
-      0,
-      'np',
+  it('lists every rate in order even when it is zero', () => {
+    expect(aggregateVatBreakdown([])).toEqual([
+      { rate: 23, netAmount: 0, vatAmount: 0 },
+      { rate: 'np', netAmount: 0, vatAmount: 0 },
     ])
   })
 
@@ -111,7 +107,7 @@ describe('aggregateVatBreakdown', () => {
     const items = aggregateVatBreakdown([
       doc([
         { rate: 23, netAmount: 100, vatAmount: 23 },
-        { rate: 8, netAmount: 50, vatAmount: 4 },
+        { rate: 'np', netAmount: 50, vatAmount: 0 },
       ]),
       doc([{ rate: 23, netAmount: 0.3, vatAmount: 0.07 }]),
     ])
@@ -120,14 +116,7 @@ describe('aggregateVatBreakdown', () => {
       netAmount: 100.3,
       vatAmount: 23.07,
     })
-    expect(items.find((item) => item.rate === 8)?.netAmount).toBe(50)
-  })
-
-  it('adds non-standard rates after the standard ones', () => {
-    const rates = aggregateVatBreakdown([
-      doc([{ rate: 7, netAmount: 10, vatAmount: 0.7 }]),
-    ]).map((item) => item.rate)
-    expect(rates.at(-1)).toBe(7)
+    expect(items.find((item) => item.rate === 'np')?.netAmount).toBe(50)
   })
 
   it('matches the document totals', () => {
@@ -136,7 +125,7 @@ describe('aggregateVatBreakdown', () => {
         { rate: 23, netAmount: 123.45, vatAmount: 28.39 },
         { rate: 'np', netAmount: 10, vatAmount: 0 },
       ]),
-      doc([{ rate: 5, netAmount: 99.99, vatAmount: 5 }]),
+      doc([{ rate: 23, netAmount: 99.99, vatAmount: 23 }]),
     ]
     expect(calculateTotals(aggregateVatBreakdown(documents))).toEqual(
       calculateDocumentTotals(documents),
@@ -145,18 +134,22 @@ describe('aggregateVatBreakdown', () => {
 })
 
 describe('buildBreakdownRows', () => {
-  it('computes shares of the net total and clamps negative rates to zero', () => {
+  it('computes shares of the total VAT amount', () => {
     const rows = buildBreakdownRows([
       { rate: 23, netAmount: 300, vatAmount: 69 },
-      { rate: 8, netAmount: 100, vatAmount: 8 },
-      { rate: 5, netAmount: -50, vatAmount: -2.5 },
+      { rate: 'np', netAmount: 100, vatAmount: 0 },
     ])
-    expect(rows.map((row) => row.share)).toEqual([300 / 350, 100 / 350, 0])
+    expect(rows.map((row) => row.share)).toEqual([1, 0])
   })
 
-  it('has zero shares when the net total is not positive', () => {
+  it('has zero shares when the VAT total is not positive, even with net sales', () => {
     expect(
-      buildBreakdownRows([{ rate: 23, netAmount: 0, vatAmount: 0 }])[0]?.share,
+      buildBreakdownRows([{ rate: 'np', netAmount: 500, vatAmount: 0 }])[0]
+        ?.share,
+    ).toBe(0)
+    expect(
+      buildBreakdownRows([{ rate: 23, netAmount: -100, vatAmount: -23 }])[0]
+        ?.share,
     ).toBe(0)
   })
 })

@@ -21,7 +21,6 @@ export interface DocumentSeed {
   contractor: Contractor
   issueDate: string
   saleDate: string
-  documentNumber: string
   ksefStatus: KsefStatus
   operationType: string
   jpkCode: string | null
@@ -56,9 +55,19 @@ function hexDigest(input: string, length: number): string {
   return result.slice(0, length).toUpperCase()
 }
 
-function buildKsefNumber(issuerNip: string, seed: DocumentSeed): string {
+/** `FV/2/10/2026/DEMO` for series FV issued on 2026-10-02 */
+function buildDocumentNumber(seed: DocumentSeed): string {
+  const [year, month, day] = seed.issueDate.split('-')
+  return `${seed.documentSeries}/${Number(day)}/${Number(month)}/${year}/DEMO`
+}
+
+function buildKsefNumber(
+  issuerNip: string,
+  seed: DocumentSeed,
+  documentNumber: string,
+): string {
   const date = seed.issueDate.replaceAll('-', '')
-  const body = hexDigest(seed.documentNumber, 12)
+  const body = hexDigest(documentNumber, 12)
   const checksum = hexDigest(`${issuerNip}${date}${body}`, 2)
   return `${issuerNip}-${date}-${body}-${checksum}`
 }
@@ -73,6 +82,7 @@ export function buildDocument(
   const sequence = String(index + 1).padStart(3, '0')
   const period = seed.issueDate.slice(2, 7).replace('-', '')
   const issuerNip = register === 'sales' ? OWN_COMPANY_NIP : seed.contractor.nip
+  const documentNumber = buildDocumentNumber(seed)
 
   return {
     id: `${register}-${sequence}`,
@@ -80,10 +90,12 @@ export function buildDocument(
     nip: seed.contractor.nip,
     issueDate: seed.issueDate,
     saleDate: seed.saleDate,
-    documentNumber: seed.documentNumber,
+    documentNumber,
     // a number is assigned by KSeF only once the invoice has been accepted
     ksefNumber:
-      seed.ksefStatus === 'confirmed' ? buildKsefNumber(issuerNip, seed) : null,
+      seed.ksefStatus === 'confirmed'
+        ? buildKsefNumber(issuerNip, seed, documentNumber)
+        : null,
     ksefStatus: seed.ksefStatus,
     identifier: `${IDENTIFIER_PREFIX[register]}-${period}-${sequence}`,
     operationType: seed.operationType,

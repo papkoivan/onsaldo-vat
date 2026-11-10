@@ -234,7 +234,6 @@ VatRegisterPage
 │   ├── DocumentToolbar
 │   │   ├── DocumentSearch
 │   │   ├── FilterButton
-│   │   ├── TagAction
 │   │   ├── PrintAction
 │   │   ├── ExportAction
 │   │   └── MoreActions
@@ -284,11 +283,12 @@ The section `Kwoty według stawek VAT` must be collapsible.
 
 Default state: collapsed.
 
-When expanded, display:
-- VAT rate.
-- Net amount.
-- VAT amount.
-- Percentage or visual distribution.
+When expanded, display one compact row per VAT rate:
+- VAT rate label: only two rates exist in the demo data, 23% and np (not subject to VAT); both are always listed, even when zero.
+- A horizontal bar showing the rate's share of the total VAT amount.
+- The VAT amount for that rate, bold and right-aligned.
+
+Keep the section minimal: no table header, no separate net-amount column, no percentage text, no totals row and no decorative icon. Net amounts per rate stay available in the document details and the CSV export.
 
 Do not hardcode calculated totals in the UI.
 
@@ -305,10 +305,9 @@ Display the following information:
 - Numer dokumentu
 - Numer KSeF
 - Identyfikator
-- Kwota netto
-- VAT
-- Kwota brutto
-- Actions
+- Actions (expand / collapse details)
+
+Amounts (netto, VAT, brutto) are not table columns; they are shown in the expanded row and in the financial summary.
 
 Use appropriate sorting indicators and interactions.
 
@@ -345,7 +344,6 @@ Each card should display:
 - Contractor.
 - Document number.
 - Date.
-- Gross amount.
 - KSeF status.
 - Expand/collapse control.
 
@@ -400,7 +398,6 @@ Implement the following actions:
 
 ### Register-level actions
 
-- Tag / document marking.
 - Print.
 - Export.
 - Additional actions menu.
@@ -408,7 +405,8 @@ Implement the following actions:
 ### Document-level actions
 
 - Expand document details.
-- Select document using checkbox.
+
+Documents have no selection checkboxes, so there are no bulk actions.
 
 ### Export
 
@@ -419,10 +417,6 @@ The export should include all relevant document fields, not only currently visib
 ### Print
 
 Provide a print-friendly document view using browser printing.
-
-### Tags
-
-Implement a functional demo interaction for document tagging.
 
 Do not perform real external accounting operations.
 
@@ -490,7 +484,7 @@ Example:
 export type RegisterType = 'sales' | 'purchases';
 
 export interface VatBreakdownItem {
-  rate: number;
+  rate: 23 | 'np';
   netAmount: number;
   vatAmount: number;
 }
